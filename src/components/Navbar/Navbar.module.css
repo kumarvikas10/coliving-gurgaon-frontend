@@ -1,0 +1,88 @@
+.navbar {
+  padding: 24px 70px;
+  background-color: transparent !important;
+  border-bottom: 1px solid rgba(22, 22, 22, 0.1);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.logo {
+  height: 24px;
+  width: auto;
+}
+
+.navbarItem{
+    color: var(--primary-black) !important;
+    font-size: 18px;
+    line-height: 1.5;
+    margin-right: 20px;
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+.navbarItem:hover{
+  color: var(--primary-color) !important;
+}
+
+/* Dropdown Styling */
+.dropdown-menu {
+  border: none;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  border-radius: 12px;
+  padding: 8px 0;
+  margin-top: 8px;
+}
+
+.dropdown-item {
+  padding: 10px 20px;
+  font-weight: 400;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  color: #333 !important;
+}
+
+.dropdown-item:hover {
+  background-color: #f8f9ff;
+  color: #6B7AED !important;
+}
+
+.dropdown-item:active {
+  background-color: #6B7AED;
+  color: white !important;
+}
+
+.dropdown-divider {
+  margin: 8px 0;
+}
+
+.ctaButton {
+  border-color: #6B7AED;
+  color: #6B7AED;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.ctaButton:hover {
+  background-color: #6B7AED;
+  border-color: #6B7AED;
+  color: white;
+}
+
+/* Active NavLink styling */
+.navbarItem.active {
+  color: #6B7AED !important;
+  font-weight: 600;
+}
+
+/* Responsive adjustments */
+@media (max-width: 991px) {
+  .dropdown-menu {
+    box-shadow: none;
+    border: 1px solid #e9ecef;
+    margin-top: 0;
+  }
+  
+  .ctaButton {
+    margin-top: 16px;
+    width: 100%;
+  }
+}
