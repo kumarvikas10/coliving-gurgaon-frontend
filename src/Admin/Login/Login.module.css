@@ -1,0 +1,47 @@
+.loginWrapper {
+  max-width: 400px;
+  margin: 100px auto;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: #f9f9f9;
+}
+
+.loginWrapper input {
+  display: block;
+  width: 100%;
+  margin-bottom: 12px;
+  padding: 10px;
+}
+
+.loginWrapper button {
+  width: 100%;
+  padding: 10px;
+  background-color: #333;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+}
+
+.loginWrapper button:hover {
+  background-color: #555;
+}
+
+.pageWrapper, .loginWrapper {
+    position: relative;
+    padding: 20px;
+    min-height: 300px;
+}
+
+.loaderOverlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+}

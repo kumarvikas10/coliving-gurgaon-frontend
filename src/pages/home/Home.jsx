@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import axios from "axios";
 import styles from "./Home.module.css";
 import location from "../../assets/Location.svg";
 import HeroBanner1 from "../../assets/Hero-banner-1.png";
@@ -26,11 +27,10 @@ import userAvatar6 from "../../assets/ananya.png";
 import reviewImage1 from "../../assets/review-image-1.png";
 import reviewImage2 from "../../assets/review-image-2.png";
 
-const Home = () => {
-  const [searchLocation, setSearchLocation] = useState("");
-  const [selectedLocation, setSelectedLocation] = useState("All");
+const API_BASE =
+  process.env.REACT_APP_API_BASE || "https://coliving-gurgaon-backend.onrender.com";
 
-  const FAQItem = ({ question, answer, defaultOpen = false }) => {
+const FAQItem = ({ question, answer, defaultOpen = false }) => {
     const [isOpen, setIsOpen] = useState(defaultOpen);
 
     const toggleFAQ = () => {
@@ -73,108 +73,175 @@ const Home = () => {
     );
   };
 
+// Map API city -> route slug and vice‑versa
+const toRouteCity = (apiCity) => {
+  const s = (apiCity || "").toLowerCase();
+  if (s === "gurgaon") return "gurugram"; // site routes use /gurugram
+  return s;
+};
+const toApiCity = (routeCity) => {
+  const s = (routeCity || "").toLowerCase();
+  if (s === "gurugram") return "gurgaon";
+  return s;
+};
+
+const displayCity = (routeCity) => {
+  const map = {
+    gurugram: "Gurgaon",
+    gurgaon: "Gurgaon",
+    delhi: "Delhi",
+    mumbai: "Mumbai",
+    bangalore: "Bangalore",
+    noida: "Noida",
+    pune: "Pune",
+  };
+  return map[routeCity?.toLowerCase()] || routeCity;
+};
+
+const Home = () => {
+  const [searchLocation, setSearchLocation] = useState("");
+  const [selectedLocation, setSelectedLocation] = useState("All");
+
+  // NEW: dynamic cities + microlocations
+  const [cities, setCities] = useState([]); // [{routeSlug:'gurugram', display:'Gurgaon'}]
+  const [selectedCity, setSelectedCity] = useState("gurugram");
+  const [microlocations, setMicrolocations] = useState([]); // [{name,slug}]
+  const [loading, setLoading] = useState(true);
+  const [err, setErr] = useState("");
+
+  // Placeholder properties until a properties API is ready
+  const properties = useMemo(
+    () => [
+      {
+        id: 1,
+        name: "COVIE Gurgaon 42",
+        location: "Sector 44, Gurgaon",
+        locationSlug: "sector-44",
+        propertySlug: "covie-gurgaon-42-sector-44-gurgaon",
+        rating: 4.1,
+        price: 16000,
+        image: propertyImage1,
+        tags: ["Digital Nomads", "Entrepreneur"],
+      },
+      {
+        id: 2,
+        name: "Covie 108",
+        location: "Medicity, Gurgaon",
+        locationSlug: "medicity",
+        propertySlug: "covie-108-medicity-gurgaon",
+        rating: 4.1,
+        price: 16000,
+        image: propertyImage2,
+        tags: ["Digital Nomads", "Entrepreneur"],
+      },
+      {
+        id: 3,
+        name: "COVIE Gurgaon 42",
+        location: "Sector 44, Gurgaon",
+        locationSlug: "sector-44",
+        propertySlug: "covie-gurgaon-42-sector-44-gurgaon-2",
+        rating: 4.1,
+        price: 16000,
+        image: propertyImage1,
+        tags: ["Digital Nomads", "Entrepreneur"],
+      },
+      {
+        id: 4,
+        name: "Covie 108",
+        location: "Medicity, Gurgaon",
+        locationSlug: "medicity",
+        propertySlug: "covie-108-medicity-gurgaon-2",
+        rating: 4.1,
+        price: 16000,
+        image: propertyImage2,
+        tags: ["Digital Nomads", "Entrepreneur"],
+      },
+    ],
+    []
+  );
+
+  // Load cities once
+  useEffect(() => {
+    const controller = new AbortController();
+    const load = async () => {
+      try {
+        setLoading(true);
+        setErr("");
+        const res = await axios.get(`${API_BASE}/api/cities`, {
+          signal: controller.signal, // axios v1 uses AbortController signal
+        });
+        // API returns [{_id, city: "gurgaon"}]
+        const list = Array.isArray(res.data) ? res.data : res.data?.data || [];
+        const normalized = list
+          .map((c) => c?.city?.toLowerCase())
+          .filter(Boolean)
+          .map((apiCity) => {
+            const routeSlug = toRouteCity(apiCity);
+            return { routeSlug, display: displayCity(routeSlug) };
+          });
+        setCities(normalized);
+        // Default selected city: first available (fall back to gurugram)
+        setSelectedCity((prev) =>
+          normalized.length ? normalized[0].routeSlug : prev
+        );
+      } catch (e) {
+        if (e.name !== "CanceledError" && e.name !== "AbortError") {
+          setErr("Failed to load cities");
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+    load();
+    return () => controller.abort();
+  }, []);
+
+  // Load microlocations whenever selectedCity changes
+  useEffect(() => {
+    if (!selectedCity) return;
+    const controller = new AbortController();
+    const load = async () => {
+      try {
+        setErr("");
+        const apiCity = toApiCity(selectedCity);
+        const res = await axios.get(
+          `${API_BASE}/api/microlocations/${apiCity}`,
+          { signal: controller.signal }
+        );
+        const raw = Array.isArray(res.data) ? res.data : res.data?.data || [];
+        const normalized = raw
+          .map((ml) => {
+            if (typeof ml === "string") {
+              return {
+                name: ml,
+                slug: ml.toLowerCase().trim().replace(/\s+/g, "-"),
+              };
+            }
+            const name = ml?.name ?? ml?.title ?? "";
+            const slug =
+              ml?.slug ??
+              name.toLowerCase().trim().replace(/\s+/g, "-");
+            return name && slug ? { name, slug } : null;
+          })
+          .filter(Boolean);
+        setMicrolocations(normalized);
+      } catch (e) {
+        if (e.name !== "CanceledError" && e.name !== "AbortError") {
+          setErr("Failed to load locations");
+          setMicrolocations([]);
+        }
+      }
+    };
+    load();
+    return () => controller.abort();
+  }, [selectedCity]);
+
   const handleSearch = (e) => {
     e.preventDefault();
-    console.log("Searching for:", searchLocation);
+    // You can route to /coliving/:citySlug or open a modal here
   };
 
-  // Location data with proper slug mapping
-  const locations = [
-    { name: "Udyog Vihar", slug: "udyog-vihar" },
-    { name: "Golf Course Road", slug: "golf-course-road" },
-    { name: "Cyber City", slug: "cyber-city" },
-    { name: "Sector 44", slug: "sector-44" },
-    { name: "Golf Course Extension Road", slug: "golf-course-extension-road" },
-    { name: "Mg Road", slug: "mg-road" },
-    { name: "Sohna Road", slug: "sohna-road" },
-    { name: "DLF Phase 3", slug: "dlf-phase-3" },
-    { name: "Cyber Park", slug: "cyber-park" },
-    { name: "Sector 49", slug: "sector-49" },
-    { name: "Sector 30", slug: "sector-30" },
-  ];
-
-  const properties = [
-    {
-      id: 1,
-      name: "The Executive Center DLF Downtown",
-      location: "Sector 44, Gurgaon",
-      locationSlug: "sector-44", // Add location slug for linking
-      rating: 4.1,
-      price: 16000,
-      image: propertyImage1,
-      tags: ["Digital Nomads", "Entrepreneur"],
-    },
-    {
-      id: 2,
-      name: "Covie 108",
-      location: "Medicity, Gurgaon",
-      locationSlug: "medicity", // Add location slug
-      rating: 4.1,
-      price: 16000,
-      image: propertyImage2,
-      tags: ["Digital Nomads", "Entrepreneur"],
-    },
-    {
-      id: 3,
-      name: "COVIE Gurgaon 42",
-      location: "Sector 44, Gurgaon",
-      locationSlug: "sector-44",
-      rating: 4.1,
-      price: 16000,
-      image: propertyImage1,
-      tags: ["Digital Nomads", "Entrepreneur"],
-    },
-    {
-      id: 4,
-      name: "Covie 108",
-      location: "Medicity, Gurgaon",
-      locationSlug: "medicity",
-      rating: 4.1,
-      price: 16000,
-      image: propertyImage2,
-      tags: ["Digital Nomads", "Entrepreneur"],
-    },
-    {
-      id: 5,
-      name: "COVIE Gurgaon 42",
-      location: "Sector 44, Gurgaon",
-      locationSlug: "sector-44",
-      rating: 4.1,
-      price: 16000,
-      image: propertyImage1,
-      tags: ["Digital Nomads", "Entrepreneur"],
-    },
-    {
-      id: 6,
-      name: "Covie 108",
-      location: "Medicity, Gurgaon",
-      locationSlug: "medicity",
-      rating: 4.1,
-      price: 16000,
-      image: propertyImage2,
-      tags: ["Digital Nomads", "Entrepreneur"],
-    },
-    {
-      id: 7,
-      name: "COVIE Gurgaon 42",
-      location: "Sector 44, Gurgaon",
-      locationSlug: "sector-44",
-      rating: 4.1,
-      price: 16000,
-      image: propertyImage1,
-      tags: ["Digital Nomads", "Entrepreneur"],
-    },
-    {
-      id: 8,
-      name: "Covie 108",
-      location: "Medicity, Gurgaon",
-      locationSlug: "medicity",
-      rating: 4.1,
-      price: 16000,
-      image: propertyImage2,
-      tags: ["Digital Nomads", "Entrepreneur"],
-    },
-  ];
+  const displaySelectedCity = displayCity(selectedCity);
 
   return (
     <>
@@ -291,39 +358,53 @@ const Home = () => {
           {/* Section Header */}
           <div className={styles.spacesHeader}>
             <div className={styles.spacesTitle}>
-              <h2>Explore Coliving Spaces in Gurgaon</h2>
+              <h2>Explore Coliving Spaces in {displaySelectedCity}</h2>
               <p>
                 Fully furnished spaces designed for comfort, community, and
-                convenience in Gurgaon
+                convenience in {displaySelectedCity}
               </p>
             </div>
-            <Link to="/coliving/gurugram" className={styles.exploreBtn}>
-              Explore Gurgaon Spaces
-            </Link>
+
+            {/* City selector (optional; remove if you want fixed Gurgaon) */}
+            <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+              <Link
+                to={`/coliving/${selectedCity}`}
+                className={styles.exploreBtn}
+              >
+                Explore {displaySelectedCity} Spaces
+              </Link>
+            </div>
           </div>
 
-          {/* Location Filters - Updated with proper micro-location links */}
+          {/* Location Filters - dynamic from API */}
           <div className={styles.locationFilters}>
-            {locations.map((location, index) => (
+            {loading && !microlocations.length && (
+              <span className="text-muted">Loading locations…</span>
+            )}
+            {!loading && !microlocations.length && !err && (
+              <span className="text-muted">No locations found</span>
+            )}
+            {!!err && <span className="text-danger">{err}</span>}
+            {microlocations.map((ml) => (
               <Link
-                key={index}
-                to={`/coliving/gurugram/${location.slug}`}
+                key={ml.slug}
+                to={`/coliving/${selectedCity}/${ml.slug}`}
                 className={`${styles.locationTag} ${
-                  selectedLocation === location.name ? styles.active : ""
+                  selectedLocation === ml.name ? styles.active : ""
                 }`}
-                onClick={() => setSelectedLocation(location.name)}
+                onClick={() => setSelectedLocation(ml.name)}
               >
-                {location.name}
+                {ml.name}
               </Link>
             ))}
           </div>
 
-          {/* Properties Grid - Updated with proper property links */}
+          {/* Properties Grid (placeholder until properties API exists) */}
           <div className={styles.propertiesGrid}>
             {properties.map((property) => (
               <Link
                 key={property.id}
-                to={`/property/${property.id}`}
+                to={`/${selectedCity}/${property.propertySlug}`}
                 className={styles.propertyCard}
                 style={{ textDecoration: "none", color: "inherit" }}
               >
@@ -359,10 +440,9 @@ const Home = () => {
                     <button
                       className={styles.enquireBtn}
                       onClick={(e) => {
-                        e.preventDefault(); // Prevent link navigation
+                        e.preventDefault();
                         e.stopPropagation();
-                        // Handle enquiry logic here
-                        console.log(`Enquiry for property ${property.id}`);
+                        // TODO: open enquiry modal or route to property detail
                       }}
                     >
                       Enquire Now
@@ -375,7 +455,7 @@ const Home = () => {
 
           {/* View More Button */}
           <div className={styles.viewMoreContainer}>
-            <Link to="/coliving/gurugram" className={styles.viewMoreBtn}>
+            <Link to={`/coliving/${selectedCity}`} className={styles.viewMoreBtn}>
               View More Spaces
             </Link>
           </div>

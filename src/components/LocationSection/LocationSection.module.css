@@ -1,0 +1,64 @@
+/* Import Leaflet CSS */
+@import '~leaflet/dist/leaflet.css';
+
+/* .locationSection {
+  padding: 60px 0;
+} */
+
+.container {
+  max-width: 1651px;
+  margin: 0 auto;
+}
+
+.locationContent {
+  display: flex;
+}
+
+/* Map Styling */
+.mapContainer {
+  width: 100%;
+  background: white;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.leafletMap {
+  border-radius: 16px;
+}
+
+/* Property marker styles */
+:global(.property-marker) {
+  background: none;
+  border: none;
+}
+
+/* Popup styling */
+.propertyPopup h4 {
+  margin: 0 0 8px 0;
+  color: var(--primary-color, #6B7AED);
+  font-size: 1.1rem;
+}
+
+.propertyPopup p {
+  margin: 4px 0;
+  color: var(--secondary-black, #666);
+  font-size: 0.9rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .locationSection {
+    padding: 40px 0;
+  }
+  
+  .mapContainer {
+    height: 300px;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 0 15px;
+  }
+}

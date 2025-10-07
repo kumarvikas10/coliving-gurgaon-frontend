@@ -1,0 +1,72 @@
+.wrapper {
+  padding: 30px;
+}
+
+.section {
+  margin-bottom: 40px;
+}
+
+.sectionHeading {
+  font-size: 22px;
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+
+.headerRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th, .table td {
+  border: 1px solid #ddd;
+  padding: 10px;
+  text-align: left;
+}
+
+.imageThumb {
+  width: 80px;
+  height: auto;
+  border-radius: 4px;
+}
+
+.addButton,
+.removeButton,
+.saveButton {
+  padding: 8px 14px;
+  font-size: 14px;
+  border: none;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: 0.2s ease-in-out;
+}
+
+.addButton {
+  background-color: #000;
+  color: #fff;
+}
+
+.removeButton {
+  background-color: #e74c3c;
+  color: #fff;
+}
+
+.saveButton {
+  background-color: #000;
+  color: #fff;
+  font-weight: 500;
+}
+
+.statusMessage {
+  margin-top: 10px;
+  font-size: 14px;
+  color: green;
+  font-weight: 500;
+}
+

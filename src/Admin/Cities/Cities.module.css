@@ -1,0 +1,108 @@
+.citiesWrapper {
+    padding: 20px;
+}
+
+.heading {
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+.inputRow {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.input {
+    padding: 8px 12px;
+    flex: 1;
+}
+
+.addButton {
+    background-color: #222;
+    color: white;
+    padding: 8px 16px;
+    cursor: pointer;
+}
+
+.cancelButton {
+    background-color: #ccc;
+    color: black;
+    padding: 8px 16px;
+    cursor: pointer;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.table th,
+.table td {
+    padding: 12px;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+
+.editButton {
+    background-color: #007bff;
+    color: white;
+    padding: 6px 12px;
+    margin-right: 8px;
+    cursor: pointer;
+}
+
+.deleteButton {
+    background-color: #dc3545;
+    color: white;
+    padding: 6px 12px;
+    cursor: pointer;
+}
+
+.loaderWrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.pageWrapper {
+    padding: 20px;
+}
+
+.inputRow {
+    margin-bottom: 20px;
+}
+
+.contentWrapper {
+    position: relative; /* important! */
+    min-height: 200px; /* so loader is centered even if table is empty */
+}
+
+.loaderOverlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 5;
+}
+
+/* Add to Media.module.css or Cities.module.css */
+.imageContainer {
+  position: relative;
+  width: 180px;
+}
+
+.imageContainer img {
+  width: 100%;
+  border-radius: 6px;
+}
+
+.imageContainer:hover .deleteButton {
+  opacity: 1;
+}

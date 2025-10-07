@@ -277,6 +277,32 @@
   background: #0056b3;
 }
 
+
+.footer_div {
+  background: #f9f9f9;
+}
+
+.footer_heading {
+  padding: 30px 0px;
+}
+
+.footer_heading h2 {
+  font-size: 18px;
+  line-height: 28px;
+  font-weight: 500;
+  text-transform: capitalize;
+  /* color: #777777; */
+}
+
+.footer_heading p {
+  font-size: 14px;
+  line-height: 24px;
+  font-weight: 300;
+  color: var(--primary-black);
+  margin: 0;
+  padding: 0;
+}
+
 /* Responsive Design */
 @media (max-width: 1024px) {
   .propertiesGrid {

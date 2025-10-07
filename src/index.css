@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Encode+Sans+Semi+Condensed:wght@100;200;300;400;500;600;700;800;900&display=swap');
+@import 'leaflet/dist/leaflet.css';
 
 :root {
   margin: 0;
@@ -25,4 +26,8 @@ h1, h2, h3, h4, h5, h6 {
 
 .navbar .navbar-collapse{
     flex-grow: 0 !important;
+}
+
+.dropdown-menu li a{
+text-transform: capitalize !important;
 }

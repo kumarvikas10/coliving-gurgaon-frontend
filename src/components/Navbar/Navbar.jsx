@@ -1,28 +1,84 @@
 // src/components/Navbar/Navbar.jsx
 import { NavLink, Link } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import axios from "axios";
 import styles from "./Navbar.module.css";
 import Logo from "../../assets/logo.svg";
 
+const API_BASE =
+  process.env.REACT_APP_API_BASE || "https://coliving-gurgaon-backend.onrender.com";
+
 function Navbar() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [cities, setCities] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [err, setErr] = useState("");
 
-  const cities = [
-    { name: "Gurgaon", slug: "gurugram" },
-    { name: "Delhi", slug: "delhi" },
-    { name: "Mumbai", slug: "mumbai" },
-    { name: "Bangalore", slug: "bangalore" },
-    { name: "Noida", slug: "noida" },
-    { name: "Pune", slug: "pune" }
-  ];
-
-  const toggleDropdown = () => {
-    setIsDropdownOpen(!isDropdownOpen);
+  const fetchCities = async (controller) => {
+    setLoading(true);
+    setErr("");
+    try {
+      const res = await axios.get(`${API_BASE}/api/cities`, {
+        signal: controller.signal, // AbortController (axios v1) for safe cleanup
+      });
+      const data = Array.isArray(res.data) ? res.data : res.data?.data || [];
+      // Normalize to { name, slug }
+      const normalized = data
+        .map((c) => {
+          const name = c.name ?? c.city ?? "";
+          // Prefer backend slug if present; otherwise derive a simple slug
+          let slug = c.slug ?? name.toLowerCase().trim().replace(/\s+/g, "-");
+          // Special case mapping if needed
+          if (!c.slug && name.toLowerCase() === "gurgaon") slug = "gurugram";
+          return name && slug ? { name, slug } : null;
+        })
+        .filter(Boolean);
+      setCities(normalized);
+    } catch (e) {
+      if (e.name !== "CanceledError" && e.name !== "AbortError") {
+        setErr(e.message || "Failed to load cities");
+        setCities([]);
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const closeDropdown = () => {
-    setIsDropdownOpen(false);
-  };
+  useEffect(() => {
+    const controller = new AbortController();
+    fetchCities(controller);
+    return () => controller.abort(); // cancel request on unmount
+  }, []);
+
+  const toggleDropdown = () => setIsDropdownOpen((v) => !v);
+  const closeDropdown = () => setIsDropdownOpen(false);
+
+  const menuItems = useMemo(() => {
+    if (loading) return <li className="px-3 py-2 text-muted">Loading…</li>;
+    if (err) return <li className="px-3 py-2 text-danger">Failed to load</li>;
+    if (!cities.length) return <li className="px-3 py-2 text-muted">No cities</li>;
+    return (
+      <>
+        {cities.map((city) => (
+          <li key={city.slug}>
+            <Link
+              to={`/coliving/${city.slug}`}
+              className="dropdown-item"
+              onClick={closeDropdown}
+            >
+              {city.name}
+            </Link>
+          </li>
+        ))}
+        {/* <li><hr className="dropdown-divider" /></li>
+        <li>
+          <Link to="/coliving" className="dropdown-item" onClick={closeDropdown}>
+            <strong>View All Cities</strong>
+          </Link>
+        </li> */}
+      </>
+    );
+  }, [cities, loading, err]);
 
   return (
     <section>
@@ -30,10 +86,10 @@ function Navbar() {
         <div className="container-fluid">
           <div>
             <NavLink to="/" className="nav-link active nav-item" aria-current="page">
-              <img className={`${styles.logo}`} src={Logo} alt="logo" />
+              <img className={styles.logo} src={Logo} alt="logo" />
             </NavLink>
           </div>
-          
+
           <button
             className="navbar-toggler"
             type="button"
@@ -43,59 +99,56 @@ function Navbar() {
             aria-expanded="false"
             aria-label="Toggle navigation"
           >
-            <span className="navbar-toggler-icon"></span>
+            <span className="navbar-toggler-icon" />
           </button>
 
           <div className="collapse navbar-collapse" id="navbarSupportedContent">
             <ul className="navbar-nav me-auto mb-2 mb-lg-0">
               <li className="nav-item">
-                <NavLink to="/" className={`${styles.navbarItem} nav-link`}>
+                <NavLink
+                  to="/"
+                  end
+                  className={({ isActive }) =>
+                    `${styles.navbarItem} nav-link ${isActive ? "active" : ""}`
+                  }
+                >
                   Home
                 </NavLink>
               </li>
 
-              {/* Custom Dropdown */}
-              <li className={`nav-item dropdown ${isDropdownOpen ? 'show' : ''}`}>
+              {/* Dynamic Locations */}
+              <li className={`nav-item dropdown ${isDropdownOpen ? "show" : ""}`}>
                 <button
                   className={`${styles.navbarItem} nav-link dropdown-toggle`}
                   onClick={toggleDropdown}
-                  style={{ background: 'none', border: 'none' }}
+                  style={{ background: "none", border: "none" }}
+                  aria-expanded={isDropdownOpen}
                 >
                   Locations
                 </button>
-                <ul className={`dropdown-menu ${isDropdownOpen ? 'show' : ''}`}>
-                  {cities.map((city, index) => (
-                    <li key={index}>
-                      <Link
-                        to={`/coliving/${city.slug}`}
-                        className="dropdown-item"
-                        onClick={closeDropdown}
-                      >
-                        {city.name}
-                      </Link>
-                    </li>
-                  ))}
-                  <li><hr className="dropdown-divider" /></li>
-                  <li>
-                    <Link
-                      to="/coliving"
-                      className="dropdown-item"
-                      onClick={closeDropdown}
-                    >
-                      <strong>View All Cities</strong>
-                    </Link>
-                  </li>
+                <ul className={`dropdown-menu ${isDropdownOpen ? "show" : ""}`}>
+                  {menuItems}
                 </ul>
               </li>
 
               <li className="nav-item">
-                <NavLink to="/about" className={`${styles.navbarItem} nav-link`}>
+                <NavLink
+                  to="/about"
+                  className={({ isActive }) =>
+                    `${styles.navbarItem} nav-link ${isActive ? "active" : ""}`
+                  }
+                >
                   About Us
                 </NavLink>
               </li>
 
               <li className="nav-item">
-                <NavLink to="/contact" className={`${styles.navbarItem} nav-link`}>
+                <NavLink
+                  to="/contact"
+                  className={({ isActive }) =>
+                    `${styles.navbarItem} nav-link ${isActive ? "active" : ""}`
+                  }
+                >
                   Contact
                 </NavLink>
               </li>

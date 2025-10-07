@@ -1,0 +1,154 @@
+/* Right Content - Sticky Booking Form */
+.rightContent {
+  position: sticky;
+  top: 100px;
+  height: fit-content;
+}
+
+.bookingForm {
+  background: var(--primary-color);
+  border-radius: 16px;
+  padding: 30px;
+  box-shadow: 0 10px 30px rgba(107, 122, 237, 0.2);
+}
+
+.formHeader {
+  margin-bottom: 25px;
+}
+
+.formTitle {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: white;
+  margin-bottom: 8px;
+}
+
+.formSubtitle {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+/* Form Styles */
+.form {
+  margin-bottom: 25px;
+}
+
+.formGroup {
+  margin-bottom: 16px;
+}
+
+.formRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.formInput {
+  width: 100%;
+  padding: 14px 16px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  background: white;
+  color: var(--primary-black, #333);
+  box-sizing: border-box;
+  transition: box-shadow 0.3s ease;
+}
+
+.formInput::placeholder {
+  color: #999;
+}
+
+.formInput:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.3);
+}
+
+.enquireBtn {
+  width: 100%;
+  background: white;
+  color: var(--primary-color, #6B7AED);
+  border: none;
+  padding: 16px;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.enquireBtn:hover {
+  background: #f8f9ff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.enquireBtn:active {
+  transform: translateY(0);
+}
+
+/* Guarantee Badges */
+.guaranteeBadges {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 25px;
+}
+
+.badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: white;
+  font-size: 0.9rem;
+}
+
+.badgeIcon {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  font-weight: bold;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .rightContent {
+    position: static;
+    order: -1; /* Show form at top on mobile */
+  }
+}
+
+@media (max-width: 768px) {
+  .bookingForm {
+    padding: 25px;
+  }
+  
+  .formRow {
+    grid-template-columns: 1fr;
+  }
+  
+  .guaranteeBadges {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .bookingForm {
+    padding: 20px;
+  }
+  
+  .formTitle {
+    font-size: 1.3rem;
+  }
+  
+  .formSubtitle {
+    font-size: 0.9rem;
+  }
+}

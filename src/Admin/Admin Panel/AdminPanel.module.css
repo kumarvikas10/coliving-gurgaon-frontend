@@ -1,0 +1,53 @@
+.adminPanel {
+  display: flex;
+  min-height: 100vh;
+}
+
+.sidebar {
+  width: 220px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background: #f7f7f7;
+  padding: 20px;
+  border-right: 1px solid #ddd;
+}
+
+.sidebarTitle {
+  margin-bottom: 30px;
+  font-size: 20px;
+  color: #333;
+}
+
+.sidebarButton {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  cursor: pointer;
+  text-align: left;
+  font-size: 16px;
+  transition: background-color 0.2s;
+}
+
+.sidebarButton:hover {
+  background-color: #eee;
+}
+
+.active {
+  background-color: #ddd;
+}
+
+.logout {
+  background-color: #ffefef;
+  border: 1px solid #e0c0c0;
+  color: red;
+  margin-top: 20px;
+}
+
+.mainContent {
+  flex: 1;
+  padding: 20px;
+}
