@@ -8,10 +8,15 @@ import Portfolio from "../Portfolio/Portfolio";
 import Microlocations from "../Microlocations/Microlocations";
 import MicrolocationContent from "../Microlocation Content/MicrolocationContent";
 import Plans from "../Plans/Plans";
+import Properties from "../Properties/Properties";
+import PropertyAdd from "../Properties/PropertyAdd";
+import Amenities from "../Amenities/Amenities";
+import States from "../States/States";
 
 const AdminPanel = () => {
   const [loggedIn, setLoggedIn] = useState(false);
   const [activePage, setActivePage] = useState("cities");
+  const [editId, setEditId] = useState(null);
 
   useEffect(() => {
     const token = localStorage.getItem("adminToken");
@@ -32,6 +37,14 @@ const AdminPanel = () => {
       <div className={styles.sidebar}>
         <div>
           <h3 className={styles.sidebarTitle}>Admin Panel</h3>
+          <button
+            className={`${styles.sidebarButton} ${
+              activePage === "states" ? styles.active : ""
+            }`}
+            onClick={() => setActivePage("states")}
+          >
+            States
+          </button>
           <button
             className={`${styles.sidebarButton} ${
               activePage === "cities" ? styles.active : ""
@@ -74,6 +87,22 @@ const AdminPanel = () => {
           </button>
           <button
             className={`${styles.sidebarButton} ${
+              activePage === "amenities" ? styles.active : ""
+            }`}
+            onClick={() => setActivePage("amenities")}
+          >
+            Amenities
+          </button>
+          <button
+            className={`${styles.sidebarButton} ${
+              activePage === "properties" ? styles.active : ""
+            }`}
+            onClick={() => setActivePage("properties")}
+          >
+            Properties
+          </button>
+          <button
+            className={`${styles.sidebarButton} ${
               activePage === "media" ? styles.active : ""
             }`}
             onClick={() => setActivePage("media")}
@@ -106,11 +135,36 @@ const AdminPanel = () => {
 
       {/* Main Content */}
       <div className={styles.mainContent}>
+        {activePage === "states" && <States />}
         {activePage === "cities" && <Cities />}
         {activePage === "content" && <CityContent />}
         {activePage === "microlocations" && <Microlocations />}
         {activePage === "microlocationContent" && <MicrolocationContent />}
         {activePage === "plans" && <Plans />}
+        {activePage === "amenities" && <Amenities />}
+        {activePage === "properties" && (
+          <Properties
+            goToAdd={() => {
+              setEditId(null);
+              setActivePage("propertiesAdd");
+            }}
+            goToEdit={(id) => {
+              console.log("[AdminPanel] goToEdit id:", id);
+              setEditId(id);
+              setActivePage("propertiesAdd");
+            }}
+          />
+        )}
+
+        {activePage === "propertiesAdd" && (
+          <PropertyAdd
+            editId={editId}
+            goBack={() => {
+              setEditId(null);
+              setActivePage("properties");
+            }}
+          />
+        )}
         {activePage === "media" && <Media />}
         {activePage === "portfolio" && <Portfolio />}
       </div>

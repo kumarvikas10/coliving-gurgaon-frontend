@@ -42,7 +42,6 @@ const propertyData = {
     ],
     tags: ["Digital Nomads", "Entrepreneur"],
     startingPrice: 16000,
-    // ... rest of your property data remains the same
     roomTypes: [
       {
         id: 1,
