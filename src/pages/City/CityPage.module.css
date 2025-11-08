@@ -1,13 +1,14 @@
 /* src/pages/city/CityPage.module.css */
 .cityPage {
   background: #ffffff;
-  min-height: 100vh;
+  /* min-height: 100vh;
+  padding: 0 60px; */
 }
 
-.container {
+/* .container {
   max-width: 1651px;
   margin: 0 auto;
-}
+} */
 
 .loading {
   display: flex;
@@ -87,8 +88,10 @@
 
 .locationFilters {
   display: flex;
-  flex-wrap: wrap;
   gap: 12px;
+  overflow-x: scroll;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 
 .locationTag {
@@ -122,7 +125,7 @@
 
 .propertiesGrid {
   display: grid;
-  grid-template-columns: repeat(4, 394px);
+  grid-template-columns: repeat(4, 23.8%);
   gap: 24px;
   justify-content: center;
   margin-bottom: 50px;
@@ -137,7 +140,7 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   border: 1px solid #f0f0f0;
-  width: 394px;
+  width: 100%;
 }
 
 .propertyCard:hover {
@@ -273,7 +276,7 @@
 }
 
 .footer_heading {
-  padding: 30px 0px;
+  padding: 60px 0;
 }
 
 .footer_heading h2 {

@@ -2,13 +2,6 @@
 .hero {
   background: #ffffff;
   padding: 60px 0;
-  min-height: 70vh;
-}
-
-.container {
-  max-width: 1651px;
-  margin: 0 auto;
-  /* padding: 0 20px; */
 }
 
 /* Title Section */
@@ -68,8 +61,8 @@
   align-items: center;
 }
 
-.locationIcon img{
-    height: 24px;
+.locationIcon img {
+  height: 24px;
 }
 
 .inputWrapper span {
@@ -257,10 +250,11 @@
 
 /* Location Filters */
 .locationFilters {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
   margin-bottom: 60px;
+  display: flex;
+  gap: 12px;
+  overflow-x: scroll;
+  scrollbar-width: none;
 }
 
 .locationTag {
@@ -273,6 +267,7 @@
   cursor: pointer;
   transition: all 0.3s ease;
   text-decoration: none;
+  white-space: nowrap;
 }
 
 .locationTag:hover {
@@ -290,7 +285,7 @@
 
 .propertiesGrid {
   display: grid;
-  grid-template-columns: repeat(4, 394px);
+  grid-template-columns: repeat(4, 23.8%);
   gap: 24px;
   justify-content: center;
   margin-bottom: 50px;
@@ -304,7 +299,7 @@
   overflow: hidden;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
-  width: 394px;
+  width: 100%;
 }
 
 .propertyCard:hover {
@@ -328,7 +323,7 @@
   position: absolute;
   top: 12px;
   right: 12px;
-  background:#fff;
+  background: #fff;
   backdrop-filter: blur(10px);
   padding: 6px 12px;
   border-radius: 20px;
@@ -339,7 +334,7 @@
   font-weight: 500;
 }
 
-.rating img{
+.rating img {
   height: 20px;
 }
 
@@ -464,10 +459,10 @@
 /* Amenities Grid */
 .amenitiesGrid {
   display: grid;
-  grid-template-columns: repeat(4, 394px);
+  grid-template-columns: repeat(4, 23.3%);
   gap: 30px;
   justify-content: center;
-  max-width: 1651px;
+  max-width: 1440px;
   margin: 0 auto;
 }
 
@@ -479,7 +474,7 @@
 }
 
 .amenityImage {
-  height: 394px;
+  height: 294px;
   overflow: hidden;
   border-radius: 16px;
 }
@@ -517,11 +512,11 @@
 /* Community Section */
 .communitySection {
   background: #F9FAFF;
-  padding: 60px 0;
   margin: 60px 0;
+  padding: 60px 0;
   position: relative;
   overflow: hidden;
-}
+} 
 
 
 .communityGrid {
@@ -579,7 +574,7 @@
   bottom: 0;
 }
 
-.communityImageContainer img{
+.communityImageContainer img {
   width: 590px;
 }
 
@@ -625,14 +620,17 @@
   display: flex;
   gap: 30px;
   overflow-x: auto;
-  scroll-behavior: smooth;  
+  scroll-behavior: smooth;
   /* Hide scrollbar but keep functionality */
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* Internet Explorer 10+ */
+  scrollbar-width: none;
+  /* Firefox */
+  -ms-overflow-style: none;
+  /* Internet Explorer 10+ */
 }
 
 .scrollableContainer::-webkit-scrollbar {
-  display: none; /* WebKit browsers */
+  display: none;
+  /* WebKit browsers */
 }
 
 /* Review Cards */
@@ -841,14 +839,14 @@
 
 /* Responsive Design */
 @media (max-width: 1024px) {
-   .propertiesGrid {
+  .propertiesGrid {
     grid-template-columns: repeat(3, 300px);
   }
-  
+
   .processCard {
     padding: 32px 24px;
   }
-  
+
   .processIcon {
     justify-content: flex-start;
     margin-bottom: 20px;
@@ -859,27 +857,29 @@
     gap: 20px;
     align-items: flex-start;
   }
-  
+
   .propertiesGrid {
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     gap: 20px;
   }
+
   .amenitiesGrid {
     grid-template-columns: repeat(3, 300px);
   }
+
   .communityGrid {
     gap: 60px;
   }
-  
+
   .communityTitle {
     font-size: 2.2rem;
   }
 
-   .reviewCard,
+  .reviewCard,
   .reviewCardWithImage {
     min-width: 320px;
   }
-  
+
   .scrollableContainer {
     gap: 20px;
   }
@@ -887,7 +887,7 @@
   .faqGrid {
     gap: 60px;
   }
-  
+
   .faqTitle {
     font-size: 2.2rem;
   }
@@ -900,41 +900,44 @@
   .mainTitle {
     font-size: 2.5rem;
   }
-  
+
   .searchContainer {
     flex-direction: column;
     padding: 16px;
   }
-  
+
   .inputWrapper {
     margin-bottom: 12px;
   }
-  
+
   .searchButton {
     width: 100%;
   }
-  
- .propertiesGrid {
+
+  .propertiesGrid {
     grid-template-columns: repeat(2, 300px);
     gap: 20px;
   }
-  
-  .card1, .card2, .card3, .card4 {
+
+  .card1,
+  .card2,
+  .card3,
+  .card4 {
     height: 200px;
   }
 
   .processSection {
     padding: 60px 0;
   }
-  
+
   .processCard {
     padding: 24px 20px;
   }
-  
+
   .processTitle {
     font-size: 1.25rem;
   }
-  
+
   .processDescription {
     font-size: 0.95rem;
   }
@@ -942,25 +945,25 @@
   .spacesSection {
     padding: 60px 0;
   }
-  
+
   .spacesTitle h2 {
     font-size: 2rem;
   }
-  
+
   .locationFilters {
     justify-content: center;
   }
-  
+
   .propertiesGrid {
     grid-template-columns: 1fr;
   }
-  
+
   .propertyFooter {
     flex-direction: column;
     gap: 12px;
     align-items: stretch;
   }
-  
+
   .enquireBtn {
     width: 100%;
   }
@@ -968,45 +971,46 @@
   .amenitiesSection {
     padding: 60px 0;
   }
-  
+
   .amenitiesTitle {
     font-size: 2rem;
   }
-  
+
   .amenitiesGrid {
     grid-template-columns: repeat(2, 300px);
     gap: 20px;
   }
-  
+
   .amenityContent {
     padding: 20px 0;
   }
-  
+
   .amenityTitle {
     font-size: 1.25rem;
   }
-  
+
   .amenityDescription {
     font-size: 0.95rem;
   }
+
   .communitySection {
     padding: 60px 0;
   }
-  
+
   .communityGrid {
     grid-template-columns: 1fr;
     gap: 40px;
     text-align: center;
   }
-  
+
   .communityTitle {
     font-size: 2rem;
   }
-  
+
   .communityDescription {
     font-size: 1rem;
   }
-  
+
   .communityContent {
     max-width: 100%;
   }
@@ -1014,20 +1018,20 @@
   .reviewsSection {
     padding: 60px 0;
   }
-  
+
   .reviewsTitle {
     font-size: 2rem;
   }
-  
+
   .reviewCard,
   .reviewCardWithImage {
     min-width: 280px;
   }
-  
+
   .reviewCard {
     padding: 20px;
   }
-  
+
   .scrollableContainer {
     padding: 10px 15px;
   }
@@ -1035,26 +1039,26 @@
   .faqSection {
     padding: 60px 0;
   }
-  
+
   .faqGrid {
     grid-template-columns: 1fr;
     gap: 40px;
     text-align: center;
   }
-  
+
   .faqTitle {
     font-size: 2rem;
   }
-  
+
   .faqContent {
     max-width: 100%;
   }
-  
+
   .contactBtn {
     width: 100%;
     text-align: center;
   }
-  
+
   .faqAccordion {
     max-width: 100%;
   }
@@ -1064,29 +1068,30 @@
   .hero {
     padding: 40px 0 60px;
   }
-  
+
   .mainTitle {
     font-size: 2rem;
   }
-  
+
   .propertiesGrid {
     grid-template-columns: 1fr;
     max-width: 300px;
     gap: 20px;
   }
-  
+
   .propertyCard {
     width: 100%;
   }
+
   .amenitiesGrid {
     grid-template-columns: 1fr;
     max-width: 300px;
   }
-  
+
   .amenityCard {
     width: 100%;
   }
-  
+
   .amenityImage {
     height: 200px;
   }
@@ -1094,12 +1099,12 @@
   .communityTitle {
     font-size: 1.75rem;
   }
-  
+
   .communityDescription {
     font-size: 0.95rem;
     margin-bottom: 24px;
   }
-  
+
   .joinBtn {
     padding: 14px 28px;
     font-size: 0.95rem;
@@ -1107,19 +1112,19 @@
     text-align: center;
   }
 
-   .reviewsTitle {
+  .reviewsTitle {
     font-size: 1.75rem;
   }
-  
+
   .reviewCard,
   .reviewCardWithImage {
     min-width: 260px;
   }
-  
+
   .reviewText {
     font-size: 0.95rem;
   }
-  
+
   .reviewImageContainer {
     height: 180px;
   }
@@ -1127,21 +1132,21 @@
   .faqTitle {
     font-size: 1.75rem;
   }
-  
+
   .faqDescription {
     font-size: 1rem;
     margin-bottom: 24px;
   }
-  
+
   .faqQuestion {
     padding: 16px 20px;
     font-size: 1rem;
   }
-  
+
   .faqAnswerContent {
     padding: 0 20px 16px 20px;
   }
-  
+
   .faqAnswerContent p {
     font-size: 0.95rem;
   }

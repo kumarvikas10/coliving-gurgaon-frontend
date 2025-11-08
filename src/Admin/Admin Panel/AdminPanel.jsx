@@ -15,8 +15,9 @@ import States from "../States/States";
 
 const AdminPanel = () => {
   const [loggedIn, setLoggedIn] = useState(false);
-  const [activePage, setActivePage] = useState("cities");
+  const [activePage, setActivePage] = useState("states");
   const [editId, setEditId] = useState(null);
+
 
   useEffect(() => {
     const token = localStorage.getItem("adminToken");

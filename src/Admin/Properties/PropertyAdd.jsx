@@ -25,6 +25,7 @@ export default function PropertyAdd({ goBack, editId }) {
   const [startingPrice, setStartingPrice] = useState(""); // NEW (optional)
   const [rating, setRating] = useState(""); // NEW
   const [reviewCount, setReviewCount] = useState(""); // NEW
+  const [states, setStates] = useState([]);
 
   const commitTags = () => {
     const pieces = tagText
@@ -104,21 +105,24 @@ export default function PropertyAdd({ goBack, editId }) {
   const [amenityOptions, setAmenityOptions] = useState([]);
   const [planOptions, setPlanOptions] = useState([]);
 
-  const adaptCities = (raw) => {
-    const list = Array.isArray(raw?.data)
-      ? raw.data
-      : Array.isArray(raw)
-      ? raw
-      : raw?.data?.data || [];
-    return list
-      .map((c) => ({
-        id: c._id || c.id || c.city_id,
-        name: c.name || c.city,
-        slug: c.slug || c.city_slug || c.city, // fallback to display string
-        state: c.state || c.state_name || "",
-      }))
-      .filter((x) => x.id && x.name);
-  };
+ const adaptCities = (raw) => {
+  const list = Array.isArray(raw?.data)
+    ? raw.data
+    : Array.isArray(raw)
+    ? raw
+    : raw?.data?.data || [];
+  
+  return list
+    .map((c) => ({
+      id: c._id || c.id || c.city_id,
+      name: c.displayCity || c.name || c.city,
+      slug: c.city || c.slug || c.city_slug,
+      // Extract state from populated object
+      state: c.state?.displayState || c.state?.state || c.state_name || c.state || "",
+      stateId: c.state?._id || null,
+    }))
+    .filter((x) => x.id && x.name);
+};
 
   const adaptMicros = (raw) => {
     const list = Array.isArray(raw?.data)
@@ -298,30 +302,57 @@ export default function PropertyAdd({ goBack, editId }) {
   };
 
   useEffect(() => {
-    const loadCities = async () => {
-      try {
-        let res;
-        try {
-          res = await axios.get(`${API_BASE}/api/cities?all=true`);
-        } catch {
-          res = await axios.get(`${API_BASE}/api/cities`);
-        }
-        const adapted = adaptCities(res.data || res);
-        setCities(adapted);
-        if (adapted.length) {
-          setCityId(adapted[0].id);
-          setCitySlug(adapted[0].slug || "");
-          // if city provides a state, preselect it
-          if (adapted[0].state) setStateVal(adapted[0].state);
-        }
-      } catch (e) {
-        console.error(e);
-        setCities([]);
+  const loadStates = async () => {
+    try {
+      const res = await axios.get(`${API_BASE}/api/states?enabled=true`);
+      const list = Array.isArray(res.data) ? res.data : res.data?.data || [];
+      console.log('✅ States loaded:', list);
+      setStates(list);
+    } catch (e) {
+      console.error('❌ Failed to load states:', e);
+      setStates([]);
+    }
+  };
+  loadStates();
+}, []);
+
+
+useEffect(() => {
+  const loadCities = async () => {
+    try {
+      // Build URL with state filter and all=true to populate state
+      const url = stateVal 
+        ? `${API_BASE}/api/cities?state=${encodeURIComponent(stateVal)}&all=true`
+        : `${API_BASE}/api/cities?all=true`;
+      
+      console.log('🔄 Fetching cities:', url);
+      const res = await axios.get(url);
+      
+      console.log('📦 Raw cities response:', res.data);
+      
+      const adapted = adaptCities(res.data || res);
+      console.log('✅ Adapted cities:', adapted);
+      
+      setCities(adapted);
+      
+      if (adapted.length) {
+        setCityId(adapted[0].id);
+        setCitySlug(adapted[0].slug || "");
+      } else {
+        setCityId("");
+        setCitySlug("");
       }
-    };
-    loadCities();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    } catch (e) {
+      console.error('❌ Error loading cities:', e);
+      setCities([]);
+    }
+  };
+  
+  loadCities();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, [stateVal]); // Re-fetch when state changes
+
+
 
   useEffect(() => {
     const loadMicros = async () => {
@@ -975,12 +1006,16 @@ export default function PropertyAdd({ goBack, editId }) {
               <select
                 className={styles.input}
                 value={stateVal}
-                onChange={(e) => setStateVal(e.target.value)}
+                onChange={(e) => {
+                  setStateVal(e.target.value);
+                  setCityId(""); // Reset city when state changes
+                  setMicro(""); // Reset microlocation when state changes
+                }}
               >
                 <option value="">Select state</option>
-                {INDIAN_STATES.map((s) => (
-                  <option key={s} value={s}>
-                    {s}
+                {states.map((s) => (
+                  <option key={s._id} value={s.displayState}>
+                     {s.displayState}  
                   </option>
                 ))}
               </select>

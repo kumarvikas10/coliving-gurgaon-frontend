@@ -7,7 +7,8 @@ import propertyImage1 from "../../assets/propertyImage1.png";
 import propertyImage2 from "../../assets/propertyImage2.png";
 
 const API_BASE =
-  process.env.REACT_APP_API_BASE || "https://coliving-gurgaon-backend.onrender.com";
+  process.env.REACT_APP_API_BASE ||
+  "https://coliving-gurgaon-backend.onrender.com";
 
 // Map app route slugs -> API slugs (backend expects "gurgaon" not "gurugram")
 const toApiSlug = (slug) => {
@@ -31,7 +32,10 @@ const displayCity = (slug) => {
 };
 
 const humanize = (slug) =>
-  (slug || "").split("-").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
+  (slug || "")
+    .split("-")
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(" ");
 
 export default function MicroLocationPage() {
   const { citySlug, locationSlug } = useParams(); // e.g., /coliving/:citySlug/:locationSlug [web:314]
@@ -39,10 +43,11 @@ export default function MicroLocationPage() {
   const cityName = displayCity(citySlug);
   const locationName = humanize(locationSlug);
 
-  const [locationData, setLocationData] = useState(null);          // header/stat card
-  const [properties, setProperties] = useState([]);                // cards grid (sample until API)
-  const [nearbyLocations, setNearbyLocations] = useState([]);      // chips
-  const [microContent, setMicroContent] = useState({               // footer/title/desc/meta
+  const [locationData, setLocationData] = useState(null); // header/stat card
+  const [properties, setProperties] = useState([]); // cards grid (sample until API)
+  const [nearbyLocations, setNearbyLocations] = useState([]); // chips
+  const [microContent, setMicroContent] = useState({
+    // footer/title/desc/meta
     title: "",
     description: "",
     footerTitle: "",
@@ -60,7 +65,8 @@ export default function MicroLocationPage() {
     [microContent.footerTitle]
   );
   const hasFooterDescription = useMemo(
-    () => microContent.footerDescription?.replace(/<[^>]+>/g, "").trim().length > 0,
+    () =>
+      microContent.footerDescription?.replace(/<[^>]+>/g, "").trim().length > 0,
     [microContent.footerDescription]
   );
 
@@ -166,10 +172,14 @@ export default function MicroLocationPage() {
           footerDescription: d.footerDescription || "",
           metaTitle:
             d.metaTitle ||
-            `Coliving Spaces in ${d.displayLocation || humanize(locationSlug)}, ${d.displayCity || cityName}`,
+            `Coliving Spaces in ${
+              d.displayLocation || humanize(locationSlug)
+            }, ${d.displayCity || cityName}`,
           metaDescription:
             d.metaDescription ||
-            `Find coliving in ${d.displayLocation || humanize(locationSlug)}, ${d.displayCity || cityName}.`,
+            `Find coliving in ${d.displayLocation || humanize(locationSlug)}, ${
+              d.displayCity || cityName
+            }.`,
           schemaMarkup: d.schemaMarkup || "",
           displayLocation: d.displayLocation || humanize(locationSlug),
           displayCity: d.displayCity || cityName,
@@ -202,8 +212,7 @@ export default function MicroLocationPage() {
             }
             const name = ml?.name ?? ml?.title ?? "";
             const slug =
-              ml?.slug ??
-              name.toLowerCase().trim().replace(/\s+/g, "-");
+              ml?.slug ?? name.toLowerCase().trim().replace(/\s+/g, "-");
             return name && slug ? { name, slug } : null;
           })
           .filter(Boolean);
@@ -226,7 +235,9 @@ export default function MicroLocationPage() {
       setLocationData({
         name: humanize(locationSlug),
         city: cityName,
-        totalProperties: (propsRes.status === "fulfilled" && propsRes.value?.data?.length) || 0,
+        totalProperties:
+          (propsRes.status === "fulfilled" && propsRes.value?.data?.length) ||
+          0,
         averagePrice: 17000,
       });
 
@@ -245,105 +256,114 @@ export default function MicroLocationPage() {
   }
 
   return (
-    <div className={styles.microLocationPage}>
-      {/* Breadcrumb */}
-      <div className={styles.breadcrumb}>
-        <div className={styles.container}>
-          <Link to="/" className={styles.breadcrumbLink}>Home</Link>
-          <span className={styles.breadcrumbSeparator}>/</span>
-          <Link to={`/coliving/${citySlug}`} className={styles.breadcrumbLink}>
-            {cityName}
-          </Link>
-          <span className={styles.breadcrumbSeparator}>/</span>
-          <span className={styles.breadcrumbCurrent}>
-            {microContent.displayLocation || locationData.name}
-          </span>
-        </div>
-      </div>
-
-      {/* Page Header */}
-      <section className={styles.pageHeader}>
-        <div className={styles.container}>
-          <div className={styles.headerContent}>
-            <h1 className={styles.pageTitle}>
-              Coliving Space in {microContent.displayLocation || locationData.name}
-            </h1>
-            <button className={styles.filtersBtn}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                <path d="M3 4.5H21V6H3V4.5Z" fill="currentColor" />
-                <path d="M3 11.25H15V12.75H3V11.25Z" fill="currentColor" />
-                <path d="M3 18H9V19.5H3V18Z" fill="currentColor" />
-              </svg>
-              Filter
-            </button>
+    <>
+      <div className={styles.microLocationPage}>
+        {/* Breadcrumb */}
+        <div className={styles.breadcrumb}>
+          <div className={`container ${styles.container}`}>
+            <Link to="/" className={styles.breadcrumbLink}>
+              Home
+            </Link>
+            <span className={styles.breadcrumbSeparator}>/</span>
+            <Link
+              to={`/coliving/${citySlug}`}
+              className={styles.breadcrumbLink}
+            >
+              {cityName}
+            </Link>
+            <span className={styles.breadcrumbSeparator}>/</span>
+            <span className={styles.breadcrumbCurrent}>
+              {microContent.displayLocation || locationData.name}
+            </span>
           </div>
         </div>
-      </section>
 
-      {/* Nearby Location Filters */}
-      <section className={styles.filtersSection}>
-        <div className={styles.container}>
-          <div className={styles.locationFilters}>
-            {nearbyLocations.map((loc) => (
-              <Link
-                key={loc.slug}
-                to={`/coliving/${citySlug}/${loc.slug}`}
-                className={`${styles.locationTag} ${
-                  loc.slug === locationSlug ? styles.active : ""
-                }`}
-              >
-                {loc.name}
-              </Link>
-            ))}
+        {/* Page Header */}
+        <section className={styles.pageHeader}>
+          <div className={`container ${styles.container}`}>
+            <div className={styles.headerContent}>
+              <h1 className={styles.pageTitle}>
+                Coliving Space in{" "}
+                {microContent.displayLocation || locationData.name}
+              </h1>
+              <button className={styles.filtersBtn}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                  <path d="M3 4.5H21V6H3V4.5Z" fill="currentColor" />
+                  <path d="M3 11.25H15V12.75H3V11.25Z" fill="currentColor" />
+                  <path d="M3 18H9V19.5H3V18Z" fill="currentColor" />
+                </svg>
+                Filter
+              </button>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Properties Grid */}
-      <section className={styles.propertiesSection}>
-        <div className={styles.container}>
-          <div className={styles.propertiesGrid}>
-            {properties.map((property) => (
-              <div key={property.id} className={styles.propertyCard}>
-                <div className={styles.propertyImage}>
-                  <img src={property.image} alt={property.name} />
-                  <div className={styles.rating}>
-                    <span>⭐</span>
-                    <span>{property.rating}</span>
-                  </div>
-                </div>
+        {/* Nearby Location Filters */}
+        <section className={styles.filtersSection}>
+          <div className={`container ${styles.container}`}>
+            <div className={styles.locationFilters}>
+              {nearbyLocations.map((loc) => (
+                <Link
+                  key={loc.slug}
+                  to={`/coliving/${citySlug}/${loc.slug}`}
+                  className={`${styles.locationTag} ${
+                    loc.slug === locationSlug ? styles.active : ""
+                  }`}
+                >
+                  {loc.name}
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
 
-                <div className={styles.propertyInfo}>
-                  <h4 className={styles.propertyName}>{property.name}</h4>
-                  <p className={styles.propertyLocation}>{property.location}</p>
-
-                  <div className={styles.propertyTags}>
-                    {property.tags.map((tag, index) => (
-                      <span key={index} className={styles.tag}>
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-
-                  <div className={styles.propertyFooter}>
-                    <div className={styles.price}>
-                      <span className={styles.amount}>
-                        ₹{property.price.toLocaleString()}
-                      </span>
-                      <span className={styles.period}> / month</span>
+        {/* Properties Grid */}
+        <section className={styles.propertiesSection}>
+          <div className={`container ${styles.container}`}>
+            <div className={styles.propertiesGrid}>
+              {properties.map((property) => (
+                <div key={property.id} className={styles.propertyCard}>
+                  <div className={styles.propertyImage}>
+                    <img src={property.image} alt={property.name} />
+                    <div className={styles.rating}>
+                      <span>⭐</span>
+                      <span>{property.rating}</span>
                     </div>
-                    <button className={styles.viewBtn}>View Number</button>
+                  </div>
+
+                  <div className={styles.propertyInfo}>
+                    <h4 className={styles.propertyName}>{property.name}</h4>
+                    <p className={styles.propertyLocation}>
+                      {property.location}
+                    </p>
+
+                    <div className={styles.propertyTags}>
+                      {property.tags.map((tag, index) => (
+                        <span key={index} className={styles.tag}>
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+
+                    <div className={styles.propertyFooter}>
+                      <div className={styles.price}>
+                        <span className={styles.amount}>
+                          ₹{property.price.toLocaleString()}
+                        </span>
+                        <span className={styles.period}> / month</span>
+                      </div>
+                      <button className={styles.viewBtn}>View Number</button>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
-
+        </section>
+      </div>
       {(hasFooterTitle || hasFooterDescription) && (
         <section className={`${styles.footer_div} mt-100 -mb-100`}>
-          <div className={styles.container}>
+          <div className={`container ${styles.container}`}>
             <div className={`${styles.footer_heading} row`}>
               {hasFooterTitle && <h2>{microContent.footerTitle}</h2>}
               {hasFooterDescription && (
@@ -357,6 +377,6 @@ export default function MicroLocationPage() {
           </div>
         </section>
       )}
-    </div>
+    </>
   );
 }

@@ -28,50 +28,47 @@ import reviewImage1 from "../../assets/review-image-1.png";
 import reviewImage2 from "../../assets/review-image-2.png";
 
 const API_BASE =
-  process.env.REACT_APP_API_BASE || "https://coliving-gurgaon-backend.onrender.com";
+  process.env.REACT_APP_API_BASE ||
+  "https://coliving-gurgaon-backend.onrender.com";
 
 const FAQItem = ({ question, answer, defaultOpen = false }) => {
-    const [isOpen, setIsOpen] = useState(defaultOpen);
+  const [isOpen, setIsOpen] = useState(defaultOpen);
 
-    const toggleFAQ = () => {
-      setIsOpen(!isOpen);
-    };
+  const toggleFAQ = () => {
+    setIsOpen(!isOpen);
+  };
 
-    return (
-      <div className={`${styles.faqItem} ${isOpen ? styles.faqItemOpen : ""}`}>
-        <button className={styles.faqQuestion} onClick={toggleFAQ}>
-          <span>{question}</span>
-          <svg
-            className={`${styles.faqIcon} ${
-              isOpen ? styles.faqIconRotated : ""
-            }`}
-            width="20"
-            height="20"
-            viewBox="0 0 20 20"
-            fill="none"
-          >
-            <path
-              d="M5 7.5L10 12.5L15 7.5"
-              stroke="#666666"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-        </button>
-
-        <div
-          className={`${styles.faqAnswer} ${
-            isOpen ? styles.faqAnswerOpen : ""
-          }`}
+  return (
+    <div className={`${styles.faqItem} ${isOpen ? styles.faqItemOpen : ""}`}>
+      <button className={styles.faqQuestion} onClick={toggleFAQ}>
+        <span>{question}</span>
+        <svg
+          className={`${styles.faqIcon} ${isOpen ? styles.faqIconRotated : ""}`}
+          width="20"
+          height="20"
+          viewBox="0 0 20 20"
+          fill="none"
         >
-          <div className={styles.faqAnswerContent}>
-            <p>{answer}</p>
-          </div>
+          <path
+            d="M5 7.5L10 12.5L15 7.5"
+            stroke="#666666"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      </button>
+
+      <div
+        className={`${styles.faqAnswer} ${isOpen ? styles.faqAnswerOpen : ""}`}
+      >
+        <div className={styles.faqAnswerContent}>
+          <p>{answer}</p>
         </div>
       </div>
-    );
-  };
+    </div>
+  );
+};
 
 // Map API city -> route slug and vice‑versa
 const toRouteCity = (apiCity) => {
@@ -104,7 +101,8 @@ const Home = () => {
 
   // NEW: dynamic cities + microlocations
   const [cities, setCities] = useState([]); // [{routeSlug:'gurugram', display:'Gurgaon'}]
-  const [selectedCity, setSelectedCity] = useState("gurugram");
+  const [selectedCity, setSelectedCity] = useState("gurugram"); // Use route slug
+
   const [microlocations, setMicrolocations] = useState([]); // [{name,slug}]
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState("");
@@ -161,32 +159,59 @@ const Home = () => {
   );
 
   // Load cities once
+  // Load cities once
   useEffect(() => {
     const controller = new AbortController();
     const load = async () => {
       try {
         setLoading(true);
         setErr("");
-        const res = await axios.get(`${API_BASE}/api/cities`, {
-          signal: controller.signal, // axios v1 uses AbortController signal
+        const res = await axios.get(`${API_BASE}/api/cities?all=true`, {
+          signal: controller.signal,
         });
-        // API returns [{_id, city: "gurgaon"}]
+
+        // API returns [{_id, city: "gurgaon", displayCity: "Gurgaon", state: {...}}]
         const list = Array.isArray(res.data) ? res.data : res.data?.data || [];
+
+        console.log("📦 Cities API response:", list); // Debug log
+
         const normalized = list
-          .map((c) => c?.city?.toLowerCase())
-          .filter(Boolean)
-          .map((apiCity) => {
+          .map((c) => {
+            const apiCity = c?.city?.toLowerCase() || "";
+            if (!apiCity) return null;
+
             const routeSlug = toRouteCity(apiCity);
-            return { routeSlug, display: displayCity(routeSlug) };
-          });
+            const display = c?.displayCity || displayCity(routeSlug);
+
+            return {
+              routeSlug,
+              display,
+              apiCity, // Store original API city name
+            };
+          })
+          .filter(Boolean);
+
+        console.log("✅ Normalized cities:", normalized); // Debug log
+
         setCities(normalized);
-        // Default selected city: first available (fall back to gurugram)
-        setSelectedCity((prev) =>
-          normalized.length ? normalized[0].routeSlug : prev
-        );
+
+        // IMPORTANT: Set default to Gurgaon (route slug is "gurugram")
+        // Only set if not already set
+        const defaultCity =
+          normalized.find((c) => c.apiCity === "gurgaon") ||
+          normalized.find((c) => c.routeSlug === "gurugram") ||
+          normalized[0];
+
+        if (defaultCity) {
+          setSelectedCity(defaultCity.routeSlug);
+          console.log("✅ Default city set to:", defaultCity.routeSlug);
+        }
       } catch (e) {
         if (e.name !== "CanceledError" && e.name !== "AbortError") {
+          console.error("❌ Failed to load cities:", e);
           setErr("Failed to load cities");
+          // Fallback to gurgaon if API fails
+          setSelectedCity("gurugram");
         }
       } finally {
         setLoading(false);
@@ -219,8 +244,7 @@ const Home = () => {
             }
             const name = ml?.name ?? ml?.title ?? "";
             const slug =
-              ml?.slug ??
-              name.toLowerCase().trim().replace(/\s+/g, "-");
+              ml?.slug ?? name.toLowerCase().trim().replace(/\s+/g, "-");
             return name && slug ? { name, slug } : null;
           })
           .filter(Boolean);
@@ -246,7 +270,7 @@ const Home = () => {
   return (
     <>
       <section className={styles.hero}>
-        <div className={styles.container}>
+        <div className={`container ${styles.container}`}>
           {/* Main Heading */}
           <div className={styles.titleSection}>
             <h1 className={styles.mainTitle}>
@@ -300,7 +324,7 @@ const Home = () => {
       </section>
       {/* How It Works Section */}
       <section className={styles.processSection}>
-        <div className={styles.container}>
+        <div className={`container ${styles.container}`}>
           <div className={styles.processGrid}>
             {/* Step 1 */}
             <div className={styles.processCard}>
@@ -354,8 +378,9 @@ const Home = () => {
       </section>
       {/* Coliving Spaces Section */}
       <section className={styles.spacesSection}>
-        <div className={styles.container}>
+        <div className={`container ${styles.container}`}>
           {/* Section Header */}
+          {/* City selector dropdown */}
           <div className={styles.spacesHeader}>
             <div className={styles.spacesTitle}>
               <h2>Explore Coliving Spaces in {displaySelectedCity}</h2>
@@ -365,8 +390,25 @@ const Home = () => {
               </p>
             </div>
 
-            {/* City selector (optional; remove if you want fixed Gurgaon) */}
             <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+              {/* <select
+                value={selectedCity}
+                onChange={(e) => setSelectedCity(e.target.value)}
+                style={{
+                  padding: "10px 16px",
+                  borderRadius: "8px",
+                  border: "1px solid #ddd",
+                  fontSize: "14px",
+                  cursor: "pointer",
+                }}
+              >
+                {cities.map((city) => (
+                  <option key={city.routeSlug} value={city.routeSlug}>
+                    {city.display}
+                  </option>
+                ))}
+              </select> */}
+
               <Link
                 to={`/coliving/${selectedCity}`}
                 className={styles.exploreBtn}
@@ -455,7 +497,10 @@ const Home = () => {
 
           {/* View More Button */}
           <div className={styles.viewMoreContainer}>
-            <Link to={`/coliving/${selectedCity}`} className={styles.viewMoreBtn}>
+            <Link
+              to={`/coliving/${selectedCity}`}
+              className={styles.viewMoreBtn}
+            >
               View More Spaces
             </Link>
           </div>
@@ -463,7 +508,7 @@ const Home = () => {
       </section>
       {/* Amenities Section */}
       <section className={styles.amenitiesSection}>
-        <div className={styles.container}>
+        <div className={`container ${styles.container}`}>
           {/* Section Header */}
           <div className={styles.amenitiesHeader}>
             <h2 className={styles.amenitiesTitle}>
@@ -533,7 +578,7 @@ const Home = () => {
       </section>
       {/* Community Section */}
       <section className={styles.communitySection}>
-        <div className={styles.container}>
+        <div className={`container ${styles.container}`}>
           <div className={styles.communityGrid}>
             {/* Left Content */}
             <div className={styles.communityContent}>
@@ -563,7 +608,7 @@ const Home = () => {
       </section>
       {/* Reviews Section */}
       <section className={styles.reviewsSection}>
-        <div className={styles.container}>
+        <div className={`container ${styles.container}`}>
           {/* Section Header */}
           <div className={styles.reviewsHeader}>
             <h2 className={styles.reviewsTitle}>
@@ -779,7 +824,7 @@ const Home = () => {
       </section>
       {/* FAQ Section */}
       <section className={styles.faqSection}>
-        <div className={styles.container}>
+        <div className={`container ${styles.container}`}>
           <div className={styles.faqGrid}>
             {/* Left Content */}
             <div className={styles.faqContent}>

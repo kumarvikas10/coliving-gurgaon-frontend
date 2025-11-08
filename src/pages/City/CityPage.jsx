@@ -7,7 +7,8 @@ import propertyImage1 from "../../assets/propertyImage1.png";
 import propertyImage2 from "../../assets/propertyImage2.png";
 
 const API_BASE =
-  process.env.REACT_APP_API_BASE || "https://coliving-gurgaon-backend.onrender.com";
+  process.env.REACT_APP_API_BASE ||
+  "https://coliving-gurgaon-backend.onrender.com";
 
 // Map app route slugs → API slugs (backend expects “gurgaon” not “gurugram”)
 const toApiSlug = (slug) => {
@@ -196,8 +197,7 @@ export default function CityPage() {
             }
             const name = ml?.name ?? ml?.title ?? "";
             const slug =
-              ml?.slug ??
-              name.toLowerCase().trim().replace(/\s+/g, "-");
+              ml?.slug ?? name.toLowerCase().trim().replace(/\s+/g, "-");
             return name && slug ? { name, slug } : null;
           })
           .filter(Boolean);
@@ -251,106 +251,109 @@ export default function CityPage() {
   }
 
   return (
-    <div className={styles.cityPage}>
-      {/* Breadcrumb */}
-      <div className={styles.breadcrumb}>
-        <div className={styles.container}>
-          <Link to="/" className={styles.breadcrumbLink}>
-            Home
-          </Link>
-          <span className={styles.breadcrumbSeparator}>/</span>
-          <span className={styles.breadcrumbCurrent}>{cityName}</span>
-        </div>
-      </div>
-
-      {/* Page Header */}
-      <section className={styles.pageHeader}>
-        <div className={styles.container}>
-          <div className={styles.headerContent}>
-            <h1 className={styles.pageTitle}>
-              Coliving Spaces in {cityContent.displayCity || cityName}
-            </h1>
-            <button className={styles.filtersBtn} onClick={toggleFilters}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                <path d="M3 4.5H21V6H3V4.5Z" fill="currentColor" />
-                <path d="M3 11.25H15V12.75H3V11.25Z" fill="currentColor" />
-                <path d="M3 18H9V19.5H3V18Z" fill="currentColor" />
-              </svg>
-              Filters
-            </button>
+    <>
+      <div className={styles.cityPage}>
+        {/* Breadcrumb */}
+        <div className={styles.breadcrumb}>
+          <div className={`container ${styles.container}`}>
+            <Link to="/" className={styles.breadcrumbLink}>
+              Home
+            </Link>
+            <span className={styles.breadcrumbSeparator}>/</span>
+            <span className={styles.breadcrumbCurrent}>{cityName}</span>
           </div>
         </div>
-      </section>
 
-      {/* Location Filters */}
-      <section className={styles.filtersSection}>
-        <div className={styles.container}>
-          <div className={styles.locationFilters}>
-            {microlocations.map((ml) => (
-              <Link
-                key={ml.slug}
-                className={`${styles.locationTag} ${
-                  selectedLocation === ml.name ? styles.active : ""
-                }`}
-                to={`/coliving/${citySlug}/${ml.slug}`}
-                onClick={() => handleLocationFilter(ml.name)}
-              >
-                {ml.name}
-              </Link>
-            ))}
+        {/* Page Header */}
+        <section className={styles.pageHeader}>
+          <div className={`container ${styles.container}`}>
+            <div className={styles.headerContent}>
+              <h1 className={styles.pageTitle}>
+                Coliving Spaces in {cityContent.displayCity || cityName}
+              </h1>
+              <button className={styles.filtersBtn} onClick={toggleFilters}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                  <path d="M3 4.5H21V6H3V4.5Z" fill="currentColor" />
+                  <path d="M3 11.25H15V12.75H3V11.25Z" fill="currentColor" />
+                  <path d="M3 18H9V19.5H3V18Z" fill="currentColor" />
+                </svg>
+                Filters
+              </button>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Properties Grid */}
-      <section className={styles.propertiesSection}>
-        <div className={styles.container}>
-          <div className={styles.propertiesGrid}>
-            {properties.map((property) => (
-              <div key={property.id} className={styles.propertyCard}>
-                <div className={styles.propertyImage}>
-                  <img src={property.image} alt={property.name} />
-                  <div className={styles.rating}>
-                    <span>⭐</span>
-                    <span>{property.rating}</span>
-                  </div>
-                </div>
+        {/* Location Filters */}
+        <section className={styles.filtersSection}>
+          <div className={`container ${styles.container}`}>
+            <div className={styles.locationFilters}>
+              {microlocations.map((ml) => (
+                <Link
+                  key={ml.slug}
+                  className={`${styles.locationTag} ${
+                    selectedLocation === ml.name ? styles.active : ""
+                  }`}
+                  to={`/coliving/${citySlug}/${ml.slug}`}
+                  onClick={() => handleLocationFilter(ml.name)}
+                >
+                  {ml.name}
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
 
-                <div className={styles.propertyInfo}>
-                  <h4 className={styles.propertyName}>{property.name}</h4>
-                  <p className={styles.propertyLocation}>{property.location}</p>
-
-                  <div className={styles.propertyTags}>
-                    {property.tags.map((tag, index) => (
-                      <span key={index} className={styles.tag}>
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-
-                  <div className={styles.propertyFooter}>
-                    <div className={styles.price}>
-                      <span className={styles.amount}>
-                        ₹{property.price.toLocaleString()}/
-                      </span>
-                      <span className={styles.period}>month</span>
+        {/* Properties Grid */}
+        <section className={styles.propertiesSection}>
+          <div className={`container ${styles.container}`}>
+            <div className={styles.propertiesGrid}>
+              {properties.map((property) => (
+                <div key={property.id} className={styles.propertyCard}>
+                  <div className={styles.propertyImage}>
+                    <img src={property.image} alt={property.name} />
+                    <div className={styles.rating}>
+                      <span>⭐</span>
+                      <span>{property.rating}</span>
                     </div>
-                    <button className={styles.enquireBtn}>Enquire Now</button>
+                  </div>
+
+                  <div className={styles.propertyInfo}>
+                    <h4 className={styles.propertyName}>{property.name}</h4>
+                    <p className={styles.propertyLocation}>
+                      {property.location}
+                    </p>
+
+                    <div className={styles.propertyTags}>
+                      {property.tags.map((tag, index) => (
+                        <span key={index} className={styles.tag}>
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+
+                    <div className={styles.propertyFooter}>
+                      <div className={styles.price}>
+                        <span className={styles.amount}>
+                          ₹{property.price.toLocaleString()}/
+                        </span>
+                        <span className={styles.period}>month</span>
+                      </div>
+                      <button className={styles.enquireBtn}>Enquire Now</button>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
 
-          <div className={styles.viewMoreContainer}>
-            <button className={styles.viewMoreBtn}>View More Spaces</button>
+            <div className={styles.viewMoreContainer}>
+              <button className={styles.viewMoreBtn}>View More Spaces</button>
+            </div>
           </div>
-        </div>
-      </section>
-
+        </section>
+      </div>
       {(hasFooterTitle || hasFooterDescription) && (
         <section className={`${styles.footer_div} mt-100 -mb-100`}>
-          <div className={styles.container}>
+          <div className={`container ${styles.container}`}>
             <div className={`${styles.footer_heading} row`}>
               {hasFooterTitle && <h2>{cityContent.footerTitle}</h2>}
               {hasFooterDescription && (
@@ -364,6 +367,6 @@ export default function CityPage() {
           </div>
         </section>
       )}
-    </div>
+    </>
   );
 }
