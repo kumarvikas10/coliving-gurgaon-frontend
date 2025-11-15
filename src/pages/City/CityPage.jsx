@@ -3,6 +3,7 @@ import { useParams, Link } from "react-router-dom";
 import { useState, useEffect, useMemo } from "react";
 import axios from "axios";
 import styles from "./CityPage.module.css";
+import rating from "../../assets/star.svg";
 import propertyImage1 from "../../assets/propertyImage1.png";
 import propertyImage2 from "../../assets/propertyImage2.png";
 
@@ -71,123 +72,29 @@ export default function CityPage() {
     const load = async () => {
       setLoading(true);
 
-      // 1) Content for footer + displayCity
-      const cityContentPromise = axios.get(
-        `${API_BASE}/api/cities/${apiCity}`,
-        { signal: controller.signal }
-      );
-
-      // 2) Microlocations
-      const microPromise = axios.get(
-        `${API_BASE}/api/microlocations/${apiCity}`,
-        { signal: controller.signal }
-      );
-
-      // 3) Properties (replace with your real endpoint when available)
-      const propsPromise = Promise.resolve({
-        data: [
+      try {
+        // 1. Get city details by slug (this returns city _id and more info)
+        const cityContentRes = await axios.get(
+          `${API_BASE}/api/cities/${apiCity}`,
           {
-            id: 1,
-            name: `COVIE ${cityName} 42`,
-            location: `Sector 44, ${cityName}`,
-            rating: 4.1,
-            price: 16000,
-            image: propertyImage1,
-            tags: ["Digital Nomads", "Entrepreneur"],
-          },
-          {
-            id: 2,
-            name: `Covie 108`,
-            location: `Medicity, ${cityName}`,
-            rating: 4.1,
-            price: 16000,
-            image: propertyImage2,
-            tags: ["Digital Nomads", "Entrepreneur"],
-          },
-          {
-            id: 3,
-            name: `COVIE ${cityName} 42`,
-            location: `Sector 44, ${cityName}`,
-            rating: 4.1,
-            price: 16000,
-            image: propertyImage1,
-            tags: ["Digital Nomads", "Entrepreneur"],
-          },
-          {
-            id: 4,
-            name: `Covie 108`,
-            location: `Medicity, ${cityName}`,
-            rating: 4.1,
-            price: 16000,
-            image: propertyImage2,
-            tags: ["Digital Nomads", "Entrepreneur"],
-          },
-          {
-            id: 5,
-            name: `COVIE ${cityName} 42`,
-            location: `Sector 44, ${cityName}`,
-            rating: 4.1,
-            price: 16000,
-            image: propertyImage1,
-            tags: ["Digital Nomads", "Entrepreneur"],
-          },
-          {
-            id: 6,
-            name: `Covie 108`,
-            location: `Medicity, ${cityName}`,
-            rating: 4.1,
-            price: 16000,
-            image: propertyImage2,
-            tags: ["Digital Nomads", "Entrepreneur"],
-          },
-        ],
-      });
+            signal: controller.signal,
+          }
+        );
+        if (cancelled) return;
 
-      // Use allSettled so one failure doesn’t blank the whole page
-      const [contentRes, microRes, propsRes] = await Promise.allSettled([
-        cityContentPromise,
-        microPromise,
-        propsPromise,
-      ]);
+        const cityContentData = cityContentRes.data;
 
-      if (cancelled) return;
+        // 2. Get microlocations based on apiCity slug (like before)
+        const microRes = await axios.get(
+          `${API_BASE}/api/microlocations/${apiCity}`,
+          {
+            signal: controller.signal,
+          }
+        );
+        if (cancelled) return;
 
-      // City content
-      if (contentRes.status === "fulfilled") {
-        const c = contentRes.value?.data || {};
-        setCityContent({
-          city: c.city || apiCity,
-          displayCity: c.displayCity || cityName,
-          title: c.title || `Explore Coliving in ${c.displayCity || cityName}`,
-          description: c.description || "",
-          footerTitle: c.footerTitle || "",
-          footerDescription: c.footerDescription || "",
-          metaTitle:
-            c.metaTitle || `Coliving Spaces in ${c.displayCity || cityName}`,
-          metaDescription:
-            c.metaDescription ||
-            `Find the best coliving spaces in ${c.displayCity || cityName}.`,
-          schemaMarkup: c.schemaMarkup || "",
-        });
-      } else {
-        // Fallback minimal content if city content API fails
-        setCityContent((prev) => ({
-          ...prev,
-          city: prev.city || apiCity,
-          displayCity: prev.displayCity || cityName,
-          title: prev.title || `Explore Coliving in ${cityName}`,
-          metaTitle: prev.metaTitle || `Coliving Spaces in ${cityName}`,
-          metaDescription:
-            prev.metaDescription ||
-            `Find the best coliving spaces in ${cityName}.`,
-        }));
-      }
-
-      // Microlocations
-      if (microRes.status === "fulfilled") {
-        const raw = microRes.value?.data;
-        const list = Array.isArray(raw) ? raw : raw?.data ?? raw?.items ?? [];
-        const normalized = list
+        const rawMicroList = microRes.data || [];
+        const normalizedMicros = rawMicroList
           .map((ml) => {
             if (typeof ml === "string") {
               return {
@@ -201,34 +108,55 @@ export default function CityPage() {
             return name && slug ? { name, slug } : null;
           })
           .filter(Boolean);
-        setMicrolocations(normalized);
-      } else {
-        setMicrolocations([]); // show no chips if API fails
-      }
 
-      // Properties (always show sample list even if other APIs fail)
-      if (propsRes.status === "fulfilled") {
-        const list = Array.isArray(propsRes.value?.data)
-          ? propsRes.value?.data
-          : [];
-        setProperties(list);
-        setCityData({
-          name: cityName,
-          totalProperties: list.length,
-          averagePrice: list.length ? 16000 : 0,
-        });
-      } else {
-        // Last-resort fallback
-        const list = [];
-        setProperties(list);
-        setCityData({
-          name: cityName,
-          totalProperties: 0,
-          averagePrice: 0,
-        });
-      }
+        setMicrolocations(normalizedMicros);
 
-      setLoading(false);
+        // 3. Get properties using city _id from cityContent API
+        const propertiesRes = await axios.get(
+          `${API_BASE}/api/properties?city=${cityContentData._id}&status=approved`,
+          { signal: controller.signal }
+        );
+        if (cancelled) return;
+
+        const propertyList = propertiesRes.data?.data || [];
+        setProperties(propertyList);
+
+        // 4. Set cityContent for display, SEO, etc
+        setCityContent({
+          city: cityContentData.city || apiCity,
+          displayCity: cityContentData.displayCity || cityName,
+          title:
+            cityContentData.title ||
+            `Explore Coliving in ${cityContentData.displayCity || cityName}`,
+          description: cityContentData.description || "",
+          footerTitle: cityContentData.footerTitle || "",
+          footerDescription: cityContentData.footerDescription || "",
+          metaTitle:
+            cityContentData.metaTitle ||
+            `Coliving Spaces in ${cityContentData.displayCity || cityName}`,
+          metaDescription:
+            cityContentData.metaDescription ||
+            `Find the best coliving spaces in ${
+              cityContentData.displayCity || cityName
+            }.`,
+          schemaMarkup: cityContentData.schemaMarkup || "",
+        });
+      } catch (error) {
+        if (!cancelled) {
+          // Fallbacks in case of error
+          setMicrolocations([]);
+          setProperties([]);
+          setCityContent({
+            city: apiCity,
+            displayCity: cityName,
+            title: `Explore Coliving in ${cityName}`,
+            metaTitle: `Coliving Spaces in ${cityName}`,
+            metaDescription: `Find the best coliving spaces in ${cityName}.`,
+          });
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
     };
 
     load();
@@ -246,7 +174,7 @@ export default function CityPage() {
 
   const toggleFilters = () => setShowFilters((v) => !v);
 
-  if (!cityData || loading) {
+  if (loading) {
     return <div className={styles.loading}>Loading...</div>;
   }
 
@@ -308,23 +236,33 @@ export default function CityPage() {
           <div className={`container ${styles.container}`}>
             <div className={styles.propertiesGrid}>
               {properties.map((property) => (
-                <div key={property.id} className={styles.propertyCard}>
+                <Link
+                  key={property._id}
+                  to={`/${citySlug}/${property.slug}`}
+                  className={styles.propertyCard}
+                  style={{ textDecoration: "none", color: "inherit" }}
+                >
                   <div className={styles.propertyImage}>
-                    <img src={property.image} alt={property.name} />
+                    <img
+                      src={property.images?.[0]?.secureUrl || ""}
+                      alt={property.name}
+                    />
                     <div className={styles.rating}>
-                      <span>⭐</span>
-                      <span>{property.rating}</span>
+                      <span>
+                        <img src={rating} alt="rating" />
+                      </span>
+                      <span>{property.rating ?? "N/A"}</span>
                     </div>
                   </div>
 
                   <div className={styles.propertyInfo}>
                     <h4 className={styles.propertyName}>{property.name}</h4>
                     <p className={styles.propertyLocation}>
-                      {property.location}
+                      {property.location?.address}
                     </p>
 
                     <div className={styles.propertyTags}>
-                      {property.tags.map((tag, index) => (
+                      {property.tags?.map((tag, index) => (
                         <span key={index} className={styles.tag}>
                           {tag}
                         </span>
@@ -334,14 +272,23 @@ export default function CityPage() {
                     <div className={styles.propertyFooter}>
                       <div className={styles.price}>
                         <span className={styles.amount}>
-                          ₹{property.price.toLocaleString()}/
+                          ₹{property.startingPrice?.toLocaleString() || "-"} /
                         </span>
                         <span className={styles.period}>month</span>
                       </div>
-                      <button className={styles.enquireBtn}>Enquire Now</button>
+                      <button
+                        className={styles.enquireBtn}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          // TODO: open enquiry modal or route to property detail
+                        }}
+                      >
+                        Enquire Now
+                      </button>
                     </div>
                   </div>
-                </div>
+                </Link>
               ))}
             </div>
 

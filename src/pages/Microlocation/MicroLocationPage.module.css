@@ -265,6 +265,21 @@
   color: var(--secondary-black);
 }
 
+.enquireBtn {
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.enquireBtn:hover {
+  background: #5A6BCE;
+}
+
 .viewBtn {
   background: var(--primary-color);
   color: white;

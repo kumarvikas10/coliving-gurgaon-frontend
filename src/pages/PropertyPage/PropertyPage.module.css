@@ -1,5 +1,3 @@
-/* src/pages/PropertyPage/PropertyPage.module.css */
-/* Add these to your existing PropertyPage.module.css */
 
 /* Custom lightbox styles */
 :global(.yarl__container) {
@@ -44,13 +42,13 @@
 
 .propertyPage {
   background: #ffffff;
-  min-height: 100vh;
+  /* min-height: 100vh; */
 }
 
-.container {
+/* .container {
   max-width: 1651px;
   margin: 0 auto;
-}
+} */
 
 .loading,
 .error {

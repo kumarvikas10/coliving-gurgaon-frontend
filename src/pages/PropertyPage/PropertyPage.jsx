@@ -1,17 +1,10 @@
-import React from "react";
+import React, { useEffect, useState, useMemo } from "react";
+import { useParams, Link } from "react-router-dom";
+import axios from "axios";
 import styles from "./PropertyPage.module.css";
-import { Link } from "react-router-dom";
-import { useEffect, useState, useMemo } from "react";
-import { useParams } from "react-router-dom";
 import location from "../../assets/Location.svg";
 import rating from "../../assets/star.svg";
 import price from "../../assets/price.svg";
-import propertyImage1 from "../../assets/propertyImage1.png";
-import propertyImage2 from "../../assets/propertyImage2.png";
-import propertyImage3 from "../../assets/propertyImage3.png";
-import propertyImage4 from "../../assets/propertyImage4.png";
-import propertyImage5 from "../../assets/propertyImage4.png";
-import propertyImage6 from "../../assets/propertyImage4.png";
 import BookingForm from "../../components/BookingForm/BookingForm";
 import LocationSection from "../../components/LocationSection/LocationSection";
 
@@ -23,146 +16,17 @@ import Zoom from "yet-another-react-lightbox/plugins/zoom";
 import Fullscreen from "yet-another-react-lightbox/plugins/fullscreen";
 import "yet-another-react-lightbox/plugins/thumbnails.css";
 
-// Updated propertyData with 6 images
-const propertyData = {
-  "covie-gurgaon-42-sector-44-gurgaon": {
-    id: 1,
-    name: "COVIE Gurgaon 42",
-    locationSlug: "sector-44",
-    propertySlug: "covie-gurgaon-42-sector-44-gurgaon",
-    rating: 4.1,
-    reviewCount: 25,
-    images: [
-      propertyImage1,
-      propertyImage2,
-      propertyImage3,
-      propertyImage4,
-      propertyImage5,
-      propertyImage6,
-    ],
-    tags: ["Digital Nomads", "Entrepreneur"],
-    startingPrice: 16000,
-    roomTypes: [
-      {
-        id: 1,
-        type: "Private Room",
-        description: "Comfortable Private Room Designed for You",
-        price: 32000,
-        originalPrice: null,
-        image: propertyImage1,
-        features: [
-          "Chair",
-          "Closet/Drawers",
-          "Desk/Workspace",
-          "Essentials",
-          "Heating",
-          "Iron",
-          "WiFi",
-        ],
-        availability: "Available",
-        maxOccupancy: 1,
-      },
-      {
-        id: 2,
-        type: "Double Sharing",
-        description:
-          "Spacious Double Sharing Room for a Balanced Living Experience",
-        price: 16000,
-        originalPrice: null,
-        image: propertyImage2,
-        features: [
-          "Chair",
-          "Closet/Drawers",
-          "Desk/Workspace",
-          "Essentials",
-          "Heating",
-          "Iron",
-          "WiFi",
-        ],
-        availability: "Available",
-        maxOccupancy: 2,
-      },
-    ],
-    about: `COVIE Gurgaon 42 is a co-living space offering fully furnished Standard and Deluxe rooms for students & working professionals. It is designed to inspire you to create and collaborate, all while aiming for you to be independent and secure. The co-living space boasts premium amenities including High-Speed Wifi, Nutritious Homemade Food, Smart TV, 24-hour Power Backup, a Washing Machine, a Refrigerator, Modern Kitchen, and a parking Space. Come and experience a new living style at COVIE from CoFynd.
-    
-    COVIE Gurgaon 42 is a co-living space offering fully furnished Standard and Deluxe rooms for students & working professionals. It is designed to inspire you to create and collaborate, all while aiming for you to be independent and secure. The co-living space boasts premium amenities including High-Speed Wifi, Nutritious Homemade Food, Smart TV, 24-hour Power Backup, a Washing Machine, a Refrigerator, Modern Kitchen, and a parking Space. Come and experience a new living style at COVIE from CoFynd.
-    
-    `,
-    amenities: [
-      { icon: "🍽️", label: "Hot & Delicious Meals", category: "Food" },
-      { icon: "🧹", label: "Housekeeping", category: "Services" },
-      { icon: "📶", label: "Wi Fi", category: "Technology" },
-      { icon: "📺", label: "TV", category: "Entertainment" },
-      { icon: "🔌", label: "Power Backup", category: "Utilities" },
-      { icon: "🔒", label: "24x7 Security", category: "Safety" },
-      { icon: "❄️", label: "Air Conditioning", category: "Comfort" },
-      { icon: "📹", label: "CCTV", category: "Safety" },
-      { icon: "🏠", label: "Fully Furnished", category: "Furniture" },
-      { icon: "🚿", label: "Geyser", category: "Utilities" },
-      { icon: "🅿️", label: "Parking", category: "Convenience" },
-      { icon: "🎬", label: "Netflix/Amazon", category: "Entertainment" },
-      { icon: "🍽️", label: "Dining Area", category: "Food" },
-      { icon: "🧺", label: "Washing Machine", category: "Services" },
-      { icon: "🏓", label: "Table Tennis", category: "Recreation" },
-      { icon: "🧺", label: "Dryer", category: "Services" },
-      { icon: "📿", label: "Almirah", category: "Storage" },
-      { icon: "🏋️", label: "Gym/Fitness Studio", category: "Recreation" },
-    ],
-    location: {
-      address: "Sector 44, Gurgaon",
-      city: "Gurgaon",
-      state: "Haryana",
-      pincode: "122001",
-      latitude: 28.466223,
-      longitude: 77.092038,
-      nearbyPlaces: [
-        {
-          name: "HUDA City Centre Metro",
-          distance: "0.5 km",
-          type: "Metro Station",
-        },
-        { name: "Cyber Hub", distance: "1.2 km", type: "IT Hub" },
-        { name: "Ambience Mall", distance: "2.0 km", type: "Shopping" },
-      ],
-    },
-    // ... rest of your property data
-    propertyDetails: {
-      buildingType: "Apartment",
-      totalFloors: 8,
-      totalRooms: 42,
-      totalBeds: 84,
-      establishedYear: 2019,
-      propertyAge: "5 years",
-      furnishingStatus: "Fully Furnished",
-      depositAmount: 10000,
-      maintenanceIncluded: true,
-      electricityIncluded: true,
-      internetIncluded: true,
-    },
-    seo: {
-      title: "COVIE Gurgaon 42 - Premium Coliving Space in Sector 44",
-      description:
-        "Fully furnished coliving rooms in Gurgaon with modern amenities, high-speed WiFi, and 24x7 security. Perfect for professionals and students.",
-      keywords: [
-        "coliving gurgaon",
-        "pg in sector 44",
-        "furnished rooms gurgaon",
-        "covie",
-      ],
-    },
-    createdAt: "2024-01-15",
-    updatedAt: "2024-09-10",
-    status: "active",
-    featured: true,
-    verified: true,
-  },
-};
+const API_BASE =
+  process.env.REACT_APP_API_BASE ||
+  "https://coliving-gurgaon-backend.onrender.com";
 
 const PropertyPage = () => {
   const { citySlug, propertySlug } = useParams();
   const [cityData, setCityData] = useState(null);
   const [property, setProperty] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [allAmenities, setAllAmenities] = useState([]);
+  const [allPlans, setAllPlans] = useState([]);
   const [selectedImage, setSelectedImage] = useState(0);
 
   // Lightbox state
@@ -171,25 +35,20 @@ const PropertyPage = () => {
   const [showFullDescription, setShowFullDescription] = useState(false);
   const WORD_LIMIT = 80;
   const { isLong, previewText } = useMemo(() => {
-    if (!property?.about) {
+    if (!property?.description) {
       return { isLong: false, previewText: "" };
     }
-
-    // Normalize whitespace and split by words
-    const words = property.about.trim().split(/\s+/);
+    const words = property.description.trim().split(/\s+/);
     const long = words.length > WORD_LIMIT;
-
-    // Join the first 80 words as preview
     const preview = long
       ? words.slice(0, WORD_LIMIT).join(" ")
-      : property.about;
+      : property.description;
 
     return { isLong: long, previewText: preview };
-  }, [property?.about]);
-  // Constants for gallery display
-  const MAX_THUMBNAILS = 4; // Show only 4 thumbnails
+  }, [property?.description]);
 
-  // City name mapping
+  const MAX_THUMBNAILS = 4;
+
   const cityNameMapping = {
     gurugram: "Gurgaon",
     gurgaon: "Gurgaon",
@@ -203,26 +62,83 @@ const PropertyPage = () => {
   const cityName = cityNameMapping[citySlug] || citySlug;
 
   useEffect(() => {
-    fetchCityData(citySlug);
-    fetchPropertyData(propertySlug);
-  }, [citySlug, propertySlug]);
+    if (!propertySlug) return;
+    const fetchPropertyData = async () => {
+      setLoading(true);
+      try {
+        const res = await axios.get(
+          `${API_BASE}/api/properties/slug/${propertySlug}`
+        );
+        setProperty(res.data?.data || null);
+      } catch (err) {
+        setProperty(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchPropertyData();
+  }, [propertySlug]);
 
-  const fetchCityData = (slug) => {
-    setCityData({
-      name: cityName,
-      totalProperties: 150,
-      averagePrice: 16000,
+  useEffect(() => {
+    const fetchAmenities = async () => {
+      try {
+        const res = await axios.get(`${API_BASE}/api/amenities?all=true`);
+        const list = res.data?.data ?? res.data ?? [];
+        setAllAmenities(Array.isArray(list) ? list : []);
+      } catch (e) {
+        setAllAmenities([]);
+      }
+    };
+    fetchAmenities();
+  }, []);
+
+  const amenitiesMap = useMemo(() => {
+    const map = new Map();
+    allAmenities.forEach((a) => {
+      map.set(a._id, a);
     });
-  };
+    return map;
+  }, [allAmenities]);
 
-  const fetchPropertyData = (slug) => {
-    setLoading(true);
-    setTimeout(() => {
-      const foundProperty = propertyData[slug];
-      setProperty(foundProperty || null);
-      setLoading(false);
-    }, 300);
-  };
+  // Filter only amenities existing on this property
+  const propertyAmenitiesDetails = property?.amenities
+    ? property.amenities.map((id) => amenitiesMap.get(id)).filter(Boolean)
+    : [];
+
+  useEffect(() => {
+    const fetchPlans = async () => {
+      try {
+        const res = await axios.get(`${API_BASE}/api/plans?all=true`);
+        const list = res.data?.data ?? res.data ?? [];
+        setAllPlans(Array.isArray(list) ? list : []);
+      } catch (error) {
+        setAllPlans([]);
+        console.error("Failed to fetch plans", error);
+      }
+    };
+    fetchPlans();
+  }, []);
+
+  const plansMap = useMemo(() => {
+    const map = new Map();
+    allPlans.forEach((plan) => {
+      map.set(plan._id, plan);
+    });
+    return map;
+  }, [allPlans]);
+
+  const enrichedPlans = property?.coliving_plans
+    ? property.coliving_plans.map((cp) => {
+        const planDetails = plansMap.get(cp.plan);
+        return {
+          ...cp,
+          planDetails,
+          type: planDetails?.type || "Plan",
+          description: planDetails?.description || "",
+          image: planDetails?.image?.secureUrl || "",
+        };
+      })
+    : [];
 
   // Function to open lightbox
   const openLightbox = (index) => {
@@ -291,7 +207,7 @@ const PropertyPage = () => {
     <div className={styles.propertyPage}>
       {/* Breadcrumb */}
       <div className={styles.breadcrumb}>
-        <div className={styles.container}>
+        <div className={`container ${styles.container}`}>
           <Link to="/" className={styles.breadcrumbLink}>
             Home
           </Link>
@@ -306,7 +222,7 @@ const PropertyPage = () => {
 
       {/* Property Header */}
       <div className={styles.propertyHeader}>
-        <div className={styles.container}>
+        <div className={`container ${styles.container}`}>
           <div className={styles.propertyHead}>
             <div>
               <h1 className={styles.propertyTitle}>{property.name}</h1>
@@ -339,45 +255,36 @@ const PropertyPage = () => {
 
       {/* Property Images with Lightbox */}
       <div className={styles.propertyImages}>
-        <div className={styles.container}>
+        <div className={`container ${styles.container}`}>
           <div className={styles.imageGallery}>
-            {/* Large Main Image - Always shows first image */}
-            <div className={styles.largeImage} onClick={() => openLightbox(0)}>
-              <img src={property.images[0]} alt="Property Main Image" />
-              <div className={styles.viewAllPhotos}>
-                View all {property.images.length} photos
+            {property.images?.length > 0 && (
+              <div
+                className={styles.largeImage}
+                onClick={() => openLightbox(0)}
+              >
+                {property.images && property.images.length > 0 && (
+                  <img src={property.images[0].secureUrl} alt={property.name} />
+                )}
+                <div className={styles.viewAllPhotos}>
+                  View all {property.images.length} photos
+                </div>
               </div>
-            </div>
-
-            {/* Small Thumbnail Images - Show only 4 thumbnails */}
+            )}
             <div className={styles.smallImages}>
-              {thumbnailsToShow.map((img, index) => {
-                const actualIndex = index + 1; // Since we're showing images 1-4
-                const isLastThumbnail = index === thumbnailsToShow.length - 1;
-
-                return (
-                  <div
-                    key={index}
-                    className={`${styles.smallImage} ${
-                      selectedImage === actualIndex ? styles.active : ""
-                    } ${
-                      isLastThumbnail && remainingImagesCount > 0
-                        ? styles.lastThumbnail
-                        : ""
-                    }`}
-                    onClick={() => handleThumbnailClick(actualIndex)}
-                  >
-                    <img src={img} alt={`Property Image ${actualIndex + 1}`} />
-
-                    {/* Show +X more overlay on last thumbnail if there are more images */}
-                    {isLastThumbnail && remainingImagesCount > 0 && (
-                      <div className={styles.moreImagesOverlay}>
-                        <span>+{remainingImagesCount} more</span>
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
+              {property.images?.slice(1, MAX_THUMBNAILS + 1).map((img, idx) => (
+                <div
+                  key={img.publicId}
+                  className={`${styles.smallImage} ${
+                    selectedImage === idx + 1 ? styles.active : ""
+                  }`}
+                  onClick={() => handleThumbnailClick(idx + 1)}
+                >
+                  <img
+                    src={img.secureUrl}
+                    alt={`${property.name} Image ${idx + 2}`}
+                  />
+                </div>
+              ))}
             </div>
           </div>
 
@@ -386,8 +293,8 @@ const PropertyPage = () => {
             open={lightboxOpen}
             close={() => setLightboxOpen(false)}
             index={lightboxIndex}
-            slides={property.images.map((img, index) => ({
-              src: img,
+            slides={(property.images || []).map((img, index) => ({
+              src: img.secureUrl,
               alt: `${property.name} - Image ${index + 1}`,
               width: 1200,
               height: 800,
@@ -433,14 +340,14 @@ const PropertyPage = () => {
         </div>
       </div>
       <div className={styles.propertyContent}>
-        <div className={styles.container}>
+        <div className={`container ${styles.container}`}>
           <div className={styles.contentGrid}>
             <div className={styles.leftContent}>
               <section className={styles.propertyAbout}>
                 <div className={styles.propertyDescription}>
                   <p className={styles.descriptionText}>
                     {showFullDescription
-                      ? property.about
+                      ? property.description
                       : `${previewText}${isLong ? "..." : ""}`}
                   </p>
 
@@ -457,17 +364,40 @@ const PropertyPage = () => {
                 <hr className={styles.headerline} />
                 <div className={styles.amenitiesSection}>
                   <h2 className={styles.sectionTitle}>Amenities</h2>
+                  {/* <div className={styles.amenitiesGrid}>
+                    {Array.isArray(property.amenities) &&
+                      property.amenities.map((amenity, index) => (
+                        <div key={index} className={styles.amenityItem}>
+                          <span className={styles.amenityIcon}>
+                            {amenity.icon}
+                          </span>
+                          <span className={styles.amenityLabel}>
+                            {amenity.label}
+                          </span>
+                        </div>
+                      ))}
+                  </div> */}
                   <div className={styles.amenitiesGrid}>
-                    {property.amenities.map((amenity, index) => (
-                      <div key={index} className={styles.amenityItem}>
-                        <span className={styles.amenityIcon}>
-                          {amenity.icon}
-                        </span>
-                        <span className={styles.amenityLabel}>
-                          {amenity.label}
-                        </span>
-                      </div>
-                    ))}
+                    {propertyAmenitiesDetails
+                      .filter((amenity) => amenity && amenity._id)
+                      .map((amenity) => (
+                        <div key={amenity._id} className={styles.amenityItem}>
+                          {amenity.icon?.secureUrl ? (
+                            <img
+                              className={styles.amenityIcon}
+                              src={amenity.icon.secureUrl}
+                              alt={amenity.label}
+                            />
+                          ) : (
+                            <span className={styles.amenityIcon}>
+                              {amenity.icon}
+                            </span> // fallback if icon is string or emoji
+                          )}
+                          <span className={styles.amenityLabel}>
+                            {amenity.name}
+                          </span>
+                        </div>
+                      ))}
                   </div>
                 </div>
               </section>
@@ -496,62 +426,87 @@ const PropertyPage = () => {
                   </div>
 
                   <div className={styles.roomsList}>
-                    {property.roomTypes.map((room) => (
-                      <article
-                        key={room.id}
-                        className={styles.roomCard}
-                        role="group"
-                        aria-labelledby={`room-${room.id}-title`}
-                      >
-                        {/* Left: Image */}
-                        <div className={styles.roomImage}>
-                          <img
-                            src={resolveRoomImage(room.image, property)}
-                            alt={room.type}
-                          />
-                        </div>
+                    {Array.isArray(enrichedPlans) &&
+                      enrichedPlans.map((room, index) => (
+                        <article
+                          key={room._id || room.plan}
+                          className={styles.roomCard}
+                          role="group"
+                          aria-labelledby={`room-${room._id}-title`}
+                        >
+                          {/* Left: Image */}
+                          <div className={styles.roomImage}>
+                            {property.images &&
+                            property.images.length > index ? (
+                              <img
+                                src={property.images[index].secureUrl}
+                                alt={`${property.name} Image ${index + 1}`}
+                              />
+                            ) : (
+                              <img src="/default-room.jpg" alt="Default Room" />
+                            )}
+                          </div>
 
-                        {/* Middle: Room info */}
-                        <div className={styles.roomInfo}>
-                          <div className={styles.roomHead}>
-                            <h3
-                              id={`room-${room.id}-title`}
-                              className={styles.roomType}
-                            >
-                              {room.type}
-                            </h3>
-                            {/* <div className={styles.availability}>
-                              <span
-                                className={
-                                  room.availability === "Available"
-                                    ? styles.available
-                                    : styles.unavailable
+                          {/* Middle: Room info */}
+                          <div className={styles.roomInfo}>
+                            <div className={styles.roomHead}>
+                              <h3
+                                id={`room-${room.id}-title`}
+                                className={styles.roomType}
+                              >
+                                {room.type}
+                              </h3>
+                            </div>
+
+                            <p className={styles.roomDescription}>
+                              {room.description}
+                            </p>
+
+                            {/* Feature chips */}
+                            <div className={styles.featureChips}>
+                              {Array.isArray(room.features) &&
+                                room.features.map((feat, i) => (
+                                  <span key={i} className={styles.chip}>
+                                    {feat}
+                                  </span>
+                                ))}
+                            </div>
+
+                            {/* CTA (mobile-first position) */}
+                            <div className={styles.mobileCta}>
+                              <button
+                                type="button"
+                                className={styles.enquireBtn}
+                                onClick={() =>
+                                  document
+                                    .getElementById("booking-form")
+                                    ?.scrollIntoView({ behavior: "smooth" })
                                 }
                               >
-                                {room.availability}
-                              </span>
-                              <span className={styles.occupancy}>
-                                Max {room.maxOccupancy}{" "}
-                                {room.maxOccupancy > 1 ? "people" : "person"}
-                              </span>
-                            </div> */}
+                                Enquire Now
+                              </button>
+                            </div>
                           </div>
 
-                          <p className={styles.roomDescription}>
-                            {room.description}
-                          </p>
-
-                          {/* Feature chips */}
-                          <div className={styles.featureChips}>
-                            {room.features.map((feat, i) => (
-                              <span key={i} className={styles.chip}>
-                                {feat}
+                          {/* Right: Price */}
+                          <div className={styles.roomPriceWrap}>
+                            <span className={styles.priceLabel}>
+                              Starting Price
+                            </span>
+                            <div className={styles.priceRow}>
+                              <span className={styles.priceSymbol}>₹</span>
+                              <span className={styles.priceValue}>
+                                {formatINR(room.price)}
                               </span>
-                            ))}
-                          </div>
-
-                          {/* CTA (mobile-first position) */}
-                          <div className={styles.mobileCta}>
+                              <span className={styles.priceUnit}>/ month</span>
+                            </div>
+                            {room.originalPrice && (
+                              <div className={styles.strikeRow}>
+                                <span className={styles.strike}>
+                                  ₹{formatINR(room.originalPrice)}
+                                </span>
+                              </div>
+                            )}
                             <button
                               type="button"
                               className={styles.enquireBtn}
@@ -564,41 +519,8 @@ const PropertyPage = () => {
                               Enquire Now
                             </button>
                           </div>
-                        </div>
-
-                        {/* Right: Price */}
-                        <div className={styles.roomPriceWrap}>
-                          <span className={styles.priceLabel}>
-                            Starting Price
-                          </span>
-                          <div className={styles.priceRow}>
-                            <span className={styles.priceSymbol}>₹</span>
-                            <span className={styles.priceValue}>
-                              {formatINR(room.price)}
-                            </span>
-                            <span className={styles.priceUnit}>/ month</span>
-                          </div>
-                          {room.originalPrice && (
-                            <div className={styles.strikeRow}>
-                              <span className={styles.strike}>
-                                ₹{formatINR(room.originalPrice)}
-                              </span>
-                            </div>
-                          )}
-                          <button
-                            type="button"
-                            className={styles.enquireBtn}
-                            onClick={() =>
-                              document
-                                .getElementById("booking-form")
-                                ?.scrollIntoView({ behavior: "smooth" })
-                            }
-                          >
-                            Enquire Now
-                          </button>
-                        </div>
-                      </article>
-                    ))}
+                        </article>
+                      ))}
                   </div>
                 </div>
               </section>

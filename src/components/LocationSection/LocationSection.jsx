@@ -67,9 +67,9 @@ const LocationSection = ({ property }) => {
                   <div className={styles.propertyPopup}>
                     <h4>{property.name}</h4>
                     <p>{location.address}</p>
-                    <p>
+                    {/* <p>
                       {location.city}, {location.state} - {location.pincode}
-                    </p>
+                    </p> */}
                   </div>
                 </Popup>
               </Marker>
