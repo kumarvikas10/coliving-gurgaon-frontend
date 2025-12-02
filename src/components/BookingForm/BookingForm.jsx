@@ -1,28 +1,67 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styles from "./BookingForm.module.css";
 
-const BookingForm = ({ property }) => {
+const BookingForm = ({ property, roomTypes }) => {
+  const API_BASE =
+    process.env.REACT_APP_API_BASE ||
+    "https://coliving-gurgaon-backend.onrender.com";
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     phone: "",
     roomType: "",
-    moveInDate: ""
+    moveInDate: "",
   });
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Form submitted:", formData);
-    // Add your form submission logic here
+    const leadData = {
+      ...formData,
+      propertyId: property?._id,
+      city: property?.location?.city || "",
+      microlocation: property?.location?.micro_locations?.[0] || "",
+      url: window.location.href,
+      createdAt: new Date().toISOString(),
+    };
+
+    try {
+      const res = await fetch(`${API_BASE}/api/leads`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(leadData),
+      });
+
+      if (res.ok) {
+        alert("Your enquiry was submitted successfully.");
+        // console.log(formData)
+        setFormData({
+          name: "",
+          email: "",
+          phone: "",
+          roomType: "",
+          moveInDate: "",
+        });
+      } else {
+        alert("Failed to submit enquiry, please try again.");
+      }
+    } catch (error) {
+      console.error("Submit failed", error);
+      alert("An error occurred. Please try again.");
+    }
   };
+
+  useEffect(() => {
+    console.log("property", roomTypes);
+  }, [roomTypes]);
 
   return (
     <div className={styles.rightContent}>
@@ -36,70 +75,73 @@ const BookingForm = ({ property }) => {
 
         <form className={styles.form} onSubmit={handleSubmit}>
           <div className={styles.formGroup}>
-            <input 
-              type="text" 
+            <input
+              type="text"
               name="name"
-              placeholder="Name" 
+              placeholder="Name"
               className={styles.formInput}
               value={formData.name}
               onChange={handleInputChange}
-              required 
+              required
             />
           </div>
-          
+
           <div className={styles.formGroup}>
-            <input 
-              type="email" 
+            <input
+              type="email"
               name="email"
-              placeholder="Email" 
+              placeholder="Email"
               className={styles.formInput}
               value={formData.email}
               onChange={handleInputChange}
-              required 
+              required
             />
           </div>
-          
+
           <div className={styles.formGroup}>
-            <input 
-              type="tel" 
+            <input
+              type="tel"
               name="phone"
-              placeholder="Phone" 
+              placeholder="Phone"
               className={styles.formInput}
               value={formData.phone}
               onChange={handleInputChange}
-              required 
+              required
             />
           </div>
-          
+
           <div className={styles.formRow}>
             <div className={styles.formGroup}>
-              <select 
+              <select
                 name="roomType"
                 className={styles.formInput}
                 value={formData.roomType}
                 onChange={handleInputChange}
               >
                 <option value="">Room Type</option>
-                {property?.roomTypes?.map((room, index) => (
-                  <option key={index} value={room.type}>
-                    {room.type} - ₹{room.price.toLocaleString()}/month
+                {roomTypes?.map((room, index) => (
+                  <option
+                    key={index}
+                    value={room.type || room.planDetails?.type}
+                  >
+                    {room.type || room.planDetails?.type}
                   </option>
                 ))}
               </select>
             </div>
-            
+
             <div className={styles.formGroup}>
-              <input 
-                type="date" 
+              <input
+                type="date"
                 name="moveInDate"
-                placeholder="Move In Date" 
+                placeholder="Move In Date"
                 className={styles.formInput}
                 value={formData.moveInDate}
                 onChange={handleInputChange}
               />
             </div>
           </div>
-          
+
           <button type="submit" className={styles.enquireBtn}>
             Enquire Now
           </button>

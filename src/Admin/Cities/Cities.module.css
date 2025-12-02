@@ -75,8 +75,8 @@
 }
 
 .contentWrapper {
-    position: relative; /* important! */
-    min-height: 200px; /* so loader is centered even if table is empty */
+    position: relative;
+    min-height: 200px;
 }
 
 .loaderOverlay {
@@ -105,4 +105,9 @@
 
 .imageContainer:hover .deleteButton {
   opacity: 1;
+}
+
+.tableWrapper {
+  overflow-x: auto;
+  max-width: 100%;
 }

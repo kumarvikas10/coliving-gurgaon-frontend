@@ -540,7 +540,7 @@ const PropertyPage = () => {
               </section>
             </div>
             <div className={styles.rightContent}>
-              <BookingForm property={property} />
+              <BookingForm property={property} roomTypes={enrichedPlans} />
             </div>
           </div>
         </div>

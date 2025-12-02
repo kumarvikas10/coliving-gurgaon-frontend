@@ -12,12 +12,12 @@ import Properties from "../Properties/Properties";
 import PropertyAdd from "../Properties/PropertyAdd";
 import Amenities from "../Amenities/Amenities";
 import States from "../States/States";
+import Leads from "../Leads/Leads";
 
 const AdminPanel = () => {
   const [loggedIn, setLoggedIn] = useState(false);
   const [activePage, setActivePage] = useState("states");
   const [editId, setEditId] = useState(null);
-
 
   useEffect(() => {
     const token = localStorage.getItem("adminToken");
@@ -118,6 +118,14 @@ const AdminPanel = () => {
           >
             Portfolio
           </button>
+          <button
+            className={`${styles.sidebarButton} ${
+              activePage === "leads" ? styles.active : ""
+            }`}
+            onClick={() => setActivePage("leads")}
+          >
+            Leads
+          </button>
         </div>
 
         {/* Logout */}
@@ -168,6 +176,7 @@ const AdminPanel = () => {
         )}
         {activePage === "media" && <Media />}
         {activePage === "portfolio" && <Portfolio />}
+        {activePage === "leads" && <Leads />}
       </div>
     </div>
   );
