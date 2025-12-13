@@ -3,8 +3,10 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import styles from "../Cities/Cities.module.css";
 import { ClipLoader } from "react-spinners";
+import Edit from '../../assets/Edit.svg'
+import Delete from '../../assets/Delete.svg'
 
-const API_BASE = process.env.REACT_APP_API_BASE || "https://coliving-gurgaon-backend.onrender.com";
+const API_BASE = process.env.REACT_APP_API_BASE;
 
 export default function States() {
   const [rows, setRows] = useState([]);
@@ -156,7 +158,7 @@ export default function States() {
           />
           Enabled
         </label>
-        <button onClick={onAddOrSave} className={styles.addButton} disabled={loading}>
+        <button onClick={onAddOrSave} className="btn primaryBtn" disabled={loading}>
           {editingId ? "Save" : "Add State"}
         </button>
         {editingId && (
@@ -171,11 +173,11 @@ export default function States() {
         <table className={styles.table}>
           <thead>
             <tr>
-              <th style={{ width: "30%" }}>Display</th>
+              <th style={{ width: "40%" }}>Display</th>
               <th style={{ width: "30%" }}>Slug</th>
               <th style={{ width: "10%" }}>Enabled</th>
               <th style={{ width: "10%" }}>Order</th>
-              <th style={{ width: "20%" }}>Actions</th>
+              <th style={{ width: "10%" }}>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -192,14 +194,14 @@ export default function States() {
                       onClick={() => onEdit(r)}
                       disabled={loading}
                     >
-                      Edit
+                      <img src={Edit} />
                     </button>
                     <button
                       className={styles.deleteButton}
                       onClick={() => onDelete(r)}
                       disabled={loading}
                     >
-                      Delete
+                      <img src={Delete} />
                     </button>
                   </div>
                 </td>

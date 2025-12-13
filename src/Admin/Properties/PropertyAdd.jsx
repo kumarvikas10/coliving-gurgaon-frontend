@@ -6,9 +6,7 @@ import axios from "axios";
 import { ClipLoader } from "react-spinners";
 import styles from "./PropertyAdd.module.css";
 
-const API_BASE =
-  process.env.REACT_APP_API_BASE ||
-  "https://coliving-gurgaon-backend.onrender.com";
+const API_BASE = process.env.REACT_APP_API_BASE;
 
 export default function PropertyAdd({ goBack, editId }) {
   const [loading, setLoading] = useState(false);

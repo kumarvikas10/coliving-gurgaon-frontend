@@ -3,8 +3,10 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import styles from "../Cities/Cities.module.css";
 import { ClipLoader } from "react-spinners";
+import Edit from '../../assets/Edit.svg'
+import Delete from '../../assets/Delete.svg'
 
-const API_BASE = process.env.REACT_APP_API_BASE || "https://coliving-gurgaon-backend.onrender.com";
+const API_BASE = process.env.REACT_APP_API_BASE;
 
 export default function Microlocations() {
   const [cities, setCities] = useState([]);           // [{ _id, city, displayCity, state }]
@@ -160,13 +162,13 @@ export default function Microlocations() {
               className={styles.input}
               style={{ minWidth: 260 }}
             />
-            <button onClick={handleAddOrSave} className={styles.addButton} disabled={loading}>
+            <button onClick={handleAddOrSave} className="btn secondaryBtn" disabled={loading}>
               {editing ? "Save" : "Add"}
             </button>
             {editing && (
               <button
                 onClick={resetForm}
-                className={styles.cancelButton}
+                className="btn primaryBtn"
                 disabled={loading}
               >
                 Cancel
@@ -193,7 +195,7 @@ export default function Microlocations() {
                         className={styles.editButton}
                         disabled={loading}
                       >
-                        Edit
+                        <img src={Edit} />
                       </button>
                       <button
                         onClick={() => handleDelete(m._id)}
@@ -201,7 +203,7 @@ export default function Microlocations() {
                         disabled={loading}
                         style={{ marginLeft: 8 }}
                       >
-                        Delete
+                        <img src={Delete} />
                       </button>
                     </td>
                   </tr>

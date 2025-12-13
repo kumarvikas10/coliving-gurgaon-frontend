@@ -1,14 +1,7 @@
 /* src/pages/city/CityPage.module.css */
 .cityPage {
   background: #ffffff;
-  /* min-height: 100vh;
-  padding: 0 60px; */
 }
-
-/* .container {
-  max-width: 1651px;
-  margin: 0 auto;
-} */
 
 .loading {
   display: flex;
@@ -41,11 +34,8 @@
 .breadcrumbCurrent {
   color: var(--primary-black);
   font-size: 0.95rem;
+  text-transform: capitalize;
 }
-
-/* .pageHeader {
-  padding-top: 20px;
-} */
 
 .headerContent {
   display: flex;

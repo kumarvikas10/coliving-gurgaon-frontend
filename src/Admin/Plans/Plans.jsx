@@ -4,10 +4,10 @@ import axios from "axios";
 import { ClipLoader } from "react-spinners";
 import styles from "../Cities/Cities.module.css";
 import PlanModal from "./PlanModal";
+import Edit from '../../assets/Edit.svg'
+import Delete from '../../assets/Delete.svg'
 
-const API_BASE =
-  process.env.REACT_APP_API_BASE ||
-  "https://coliving-gurgaon-backend.onrender.com";
+const API_BASE = process.env.REACT_APP_API_BASE;
 
 const Plans = () => {
   const [plans, setPlans] = useState([]);
@@ -294,10 +294,10 @@ const Plans = () => {
         <table className={styles.table}>
           <thead>
             <tr>
-              <th style={{ width: "20%" }}>Type</th>
-              <th style={{ width: "40%" }}>Description</th>
-              <th style={{ width: "15%" }}>Enabled</th>
-              <th style={{ width: "25%" }}>Actions</th>
+              <th style={{ width: "30%" }}>Type</th>
+              <th style={{ width: "50%" }}>Description</th>
+              <th style={{ width: "10%" }}>Enabled</th>
+              <th style={{ width: "10%" }}>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -316,21 +316,14 @@ const Plans = () => {
                       className={styles.editButton}
                       disabled={loading}
                     >
-                      Edit
+                      <img src={Edit} />
                     </button>
-                    {/* <button
-                      onClick={() => onToggleEnabled(p)}
-                      className={styles.addButton}
-                      disabled={loading}
-                    >
-                      {p.enabled ? "Disable" : "Enable"}
-                    </button> */}
                     <button
                       onClick={() => onDelete(p)}
                       className={styles.deleteButton}
                       disabled={loading}
                     >
-                      Delete
+                      <img src={Delete} />
                     </button>
                   </div>
                 </td>
@@ -435,13 +428,13 @@ const Plans = () => {
 
           <div style={{ display: "flex", gap: 10, marginTop: 6 }}>
             <button
-              className={styles.addButton}
+              className="btn primaryBtn"
               onClick={createPlan}
               disabled={loading}
             >
               Save Plan
             </button>
-            <button className={styles.cancelButton} onClick={handleClose}>
+            <button className="btn secondaryBtn" onClick={handleClose}>
               Cancel
             </button>
           </div>
@@ -543,14 +536,14 @@ const Plans = () => {
 
           <div style={{ display: "flex", gap: 10, marginTop: 6 }}>
             <button
-              className={styles.addButton}
+              className="btn primaryBtn"
               onClick={saveEditPlan}
               disabled={loading}
             >
               Save Changes
             </button>
             <button
-              className={styles.cancelButton}
+              className="btn secondaryBtn"
               onClick={() => setIsEditOpen(false)}
             >
               Cancel

@@ -4,33 +4,8 @@ import { useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import styles from "./MicroLocationPage.module.css";
 import rating from "../../assets/star.svg";
-import propertyImage1 from "../../assets/propertyImage1.png";
-import propertyImage2 from "../../assets/propertyImage2.png";
 
-const API_BASE =
-  process.env.REACT_APP_API_BASE ||
-  "https://coliving-gurgaon-backend.onrender.com";
-
-// Map app route slugs -> API slugs (backend expects "gurgaon" not "gurugram")
-const toApiSlug = (slug) => {
-  const s = (slug || "").toLowerCase();
-  if (s === "gurugram") return "gurgaon";
-  return s;
-};
-
-// Display names for headings
-const displayCity = (slug) => {
-  const map = {
-    gurugram: "Gurgaon",
-    gurgaon: "Gurgaon",
-    delhi: "Delhi",
-    mumbai: "Mumbai",
-    bangalore: "Bangalore",
-    noida: "Noida",
-    pune: "Pune",
-  };
-  return map[slug?.toLowerCase()] || slug;
-};
+const API_BASE = process.env.REACT_APP_API_BASE;
 
 const humanize = (slug) =>
   (slug || "")
@@ -39,9 +14,7 @@ const humanize = (slug) =>
     .join(" ");
 
 export default function MicroLocationPage() {
-  const { citySlug, locationSlug } = useParams(); // e.g., /coliving/:citySlug/:locationSlug [web:314]
-  const apiCity = toApiSlug(citySlug);
-  const cityName = displayCity(citySlug);
+  const { citySlug, locationSlug } = useParams();
   const locationName = humanize(locationSlug);
 
   const [locationData, setLocationData] = useState(null); // header/stat card
@@ -72,111 +45,130 @@ export default function MicroLocationPage() {
   );
 
   useEffect(() => {
-    let cancelled = false;
-    const controller = new AbortController();
+  let cancelled = false;
+  const controller = new AbortController();
 
-    const load = async () => {
-      setLoading(true);
+  const load = async () => {
+    setLoading(true);
 
-      try {
-        // 1) Microlocation content with _id
-        const contentRes = await axios.get(
-          `${API_BASE}/api/microlocations/${apiCity}/${locationSlug}`,
-          { signal: controller.signal }
-        );
-        if (cancelled) return;
-        const microlocationData = contentRes.data;
+    try {
+      // 1) Microlocation content with _id (backend must resolve citySlug -> city)
+      const contentRes = await axios.get(
+        `${API_BASE}/api/microlocations/${citySlug}/${locationSlug}`,
+        { signal: controller.signal }
+      );
+      if (cancelled) return;
+      const microlocationData = contentRes.data;
 
-        // 2) All microlocations for chips UI
-        const chipsRes = await axios.get(
-          `${API_BASE}/api/microlocations/${apiCity}`,
-          {
-            signal: controller.signal,
-          }
-        );
-        if (cancelled) return;
+      // resolve city identifiers from backend
+      const cityObj = microlocationData.city || {};
+      const apiCity = (cityObj.city || citySlug || "").toLowerCase();
+      const displayCity =
+        cityObj.displayCity || cityObj.city || citySlug;
+      const displayLocation =
+        microlocationData.displayLocation || humanize(locationSlug);
 
-        const rawChips = chipsRes.data || [];
-        const normalizedChips = rawChips
-          .map((ml) =>
-            typeof ml === "string"
-              ? { name: ml, slug: ml.toLowerCase().trim().replace(/\s+/g, "-") }
-              : { name: ml?.name ?? "", slug: ml?.slug ?? "" }
-          )
-          .filter((i) => i.name && i.slug);
+      // 2) All microlocations for chips UI (by apiCity)
+      const chipsRes = await axios.get(
+        `${API_BASE}/api/microlocations/${apiCity}`,
+        { signal: controller.signal }
+      );
+      if (cancelled) return;
 
-        setNearbyLocations(normalizedChips);
+      const rawChips = chipsRes.data || [];
+      const normalizedChips = rawChips
+        .map((ml) =>
+          typeof ml === "string"
+            ? {
+                name: ml,
+                slug: ml.toLowerCase().trim().replace(/\s+/g, "-"),
+              }
+            : {
+                name: ml?.name ?? ml?.displayLocation ?? "",
+                slug:
+                  ml?.slug ||
+                  (ml?.name || ml?.displayLocation || "")
+                    .toLowerCase()
+                    .trim()
+                    .replace(/\s+/g, "-"),
+              }
+        )
+        .filter((i) => i.name && i.slug);
 
-        // 3) — real properties API with microlocation filter
-        const cityId = microlocationData.city?._id || ""; // make sure you have city reference on microlocation
-        const microlocationId = microlocationData._id;
+      setNearbyLocations(normalizedChips);
 
-        const propsRes = await axios.get(
-          `${API_BASE}/api/properties?city=${cityId}&micro=${microlocationId}&status=approved`,
-          { signal: controller.signal }
-        );
-        if (cancelled) return;
+      // 3) Properties using city._id and microlocation _id
+      const cityId = cityObj._id || "";
+      const microlocationId = microlocationData._id;
 
-        const propertyList = propsRes.data?.data || [];
-        setProperties(propertyList);
+      const propsRes = await axios.get(
+        `${API_BASE}/api/properties?city=${cityId}&micro=${microlocationId}&status=approved`,
+        { signal: controller.signal }
+      );
+      if (cancelled) return;
 
-        // 4) Update microContent state (title etc)
-        setMicroContent({
-          title:
-            microlocationData.title ||
-            `Coliving Space in ${humanize(locationSlug)}`,
-          description: microlocationData.description || "",
-          footerTitle: microlocationData.footerTitle || "",
-          footerDescription: microlocationData.footerDescription || "",
-          metaTitle:
-            microlocationData.metaTitle ||
-            `Coliving Spaces in ${
-              microlocationData.displayLocation || humanize(locationSlug)
-            }, ${microlocationData.displayCity || cityName}`,
-          metaDescription:
-            microlocationData.metaDescription ||
-            `Find coliving in ${
-              microlocationData.displayLocation || humanize(locationSlug)
-            }, ${microlocationData.displayCity || cityName}.`,
-          schemaMarkup: microlocationData.schemaMarkup || "",
-          displayLocation:
-            microlocationData.displayLocation || humanize(locationSlug),
-          displayCity: microlocationData.displayCity || cityName,
-        });
+      const propertyList = propsRes.data?.data || [];
+      setProperties(propertyList);
 
-        // 5) Update locationData with stats
+      // 4) microContent (SEO + headings)
+      setMicroContent({
+        title:
+          microlocationData.title ||
+          `Coliving Space in ${displayLocation}`,
+        description: microlocationData.description || "",
+        footerTitle: microlocationData.footerTitle || "",
+        footerDescription: microlocationData.footerDescription || "",
+        metaTitle:
+          microlocationData.metaTitle ||
+          `Coliving Spaces in ${displayLocation}, ${displayCity}`,
+        metaDescription:
+          microlocationData.metaDescription ||
+          `Find coliving in ${displayLocation}, ${displayCity}.`,
+        schemaMarkup: microlocationData.schemaMarkup || "",
+        displayLocation,
+        displayCity,
+      });
+
+      // 5) locationData with stats
+      setLocationData({
+        name: displayLocation,
+        city: displayCity,
+        totalProperties: propertyList.length,
+        averagePrice: propertyList.length
+          ? propertyList.reduce(
+              (acc, p) => acc + (p.startingPrice || 0),
+              0
+            ) / propertyList.length
+          : 0,
+      });
+    } catch (error) {
+      if (!cancelled) {
+        const fallbackLocation = humanize(locationSlug);
+        setNearbyLocations([]);
+        setProperties([]);
         setLocationData({
-          name: humanize(locationSlug),
-          city: cityName,
-          totalProperties: propertyList.length,
-          averagePrice: propertyList.length
-            ? propertyList.reduce((acc, p) => acc + (p.startingPrice || 0), 0) /
-              propertyList.length
-            : 0,
+          name: fallbackLocation,
+          city: citySlug,
+          totalProperties: 0,
+          averagePrice: 0,
         });
-      } catch (error) {
-        if (!cancelled) {
-          setNearbyLocations([]);
-          setProperties([]);
-          setLocationData({
-            name: humanize(locationSlug),
-            city: cityName,
-            totalProperties: 0,
-            averagePrice: 0,
-          });
-        }
-      } finally {
-        if (!cancelled) setLoading(false);
+        setMicroContent((prev) => ({
+          ...prev,
+          displayLocation: fallbackLocation,
+          displayCity: citySlug,
+        }));
       }
-    };
+    } finally {
+      if (!cancelled) setLoading(false);
+    }
+  };
 
-    load();
-    return () => {
-      cancelled = true;
-      controller.abort();
-    };
-  }, [citySlug, locationSlug, apiCity, cityName]);
-
+  load();
+  return () => {
+    cancelled = true;
+    controller.abort();
+  };
+}, [citySlug, locationSlug]);
 
   if (!locationData || loading) {
     return <div className={styles.loading}>Loading...</div>;
@@ -196,7 +188,7 @@ export default function MicroLocationPage() {
               to={`/coliving/${citySlug}`}
               className={styles.breadcrumbLink}
             >
-              {cityName}
+              {microContent.displayCity || citySlug}
             </Link>
             <span className={styles.breadcrumbSeparator}>/</span>
             <span className={styles.breadcrumbCurrent}>

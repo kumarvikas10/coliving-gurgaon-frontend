@@ -18,10 +18,21 @@
     flex: 1;
 }
 
-.addButton {
-    background-color: #222;
+.statusButton{
+    background: none;
+    border: none;
     color: white;
-    padding: 8px 16px;
+    cursor: pointer;
+}
+
+.statusButton img{
+     width: 30px;
+}
+
+.addButton {
+    background: none;
+    border: none;
+    color: white;
     cursor: pointer;
 }
 
@@ -45,18 +56,25 @@
 }
 
 .editButton {
-    background-color: #007bff;
+    background: none;
+    border: none;
     color: white;
-    padding: 6px 12px;
-    margin-right: 8px;
     cursor: pointer;
 }
 
+.editButton img {
+    width: 20px;
+}
+
 .deleteButton {
-    background-color: #dc3545;
+    background: none;
+    border: none;
     color: white;
-    padding: 6px 12px;
     cursor: pointer;
+}
+
+.deleteButton img {
+    width: 20px;
 }
 
 .loaderWrapper {
@@ -94,20 +112,20 @@
 
 /* Add to Media.module.css or Cities.module.css */
 .imageContainer {
-  position: relative;
-  width: 180px;
+    position: relative;
+    width: 180px;
 }
 
 .imageContainer img {
-  width: 100%;
-  border-radius: 6px;
+    width: 100%;
+    border-radius: 6px;
 }
 
 .imageContainer:hover .deleteButton {
-  opacity: 1;
+    opacity: 1;
 }
 
 .tableWrapper {
-  overflow-x: auto;
-  max-width: 100%;
+    overflow-x: auto;
+    max-width: 100%;
 }

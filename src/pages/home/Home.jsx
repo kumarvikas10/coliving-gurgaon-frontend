@@ -11,8 +11,6 @@ import submitIcon from "../../assets/submit-icon.svg";
 import operatorIcon from "../../assets/operator-icon.svg";
 import rating from "../../assets/star.svg";
 import { Link } from "react-router-dom";
-import propertyImage1 from "../../assets/propertyImage1.png";
-import propertyImage2 from "../../assets/propertyImage2.png";
 import monthlyBreakfast from "../../assets/monthly-breakfast.png";
 import movieNights from "../../assets/movie-nights.png";
 import sportsFitness from "../../assets/sports-fitness.png";
@@ -27,9 +25,7 @@ import userAvatar6 from "../../assets/ananya.png";
 import reviewImage1 from "../../assets/review-image-1.png";
 import reviewImage2 from "../../assets/review-image-2.png";
 
-const API_BASE =
-  process.env.REACT_APP_API_BASE ||
-  "https://coliving-gurgaon-backend.onrender.com";
+const API_BASE = process.env.REACT_APP_API_BASE;
 
 const FAQItem = ({ question, answer, defaultOpen = false }) => {
   const [isOpen, setIsOpen] = useState(defaultOpen);
@@ -70,31 +66,6 @@ const FAQItem = ({ question, answer, defaultOpen = false }) => {
   );
 };
 
-// Map API city -> route slug and vice‑versa
-const toRouteCity = (apiCity) => {
-  const s = (apiCity || "").toLowerCase();
-  if (s === "gurgaon") return "gurugram"; // site routes use /gurugram
-  return s;
-};
-const toApiCity = (routeCity) => {
-  const s = (routeCity || "").toLowerCase();
-  if (s === "gurugram") return "gurgaon";
-  return s;
-};
-
-const displayCity = (routeCity) => {
-  const map = {
-    gurugram: "Gurgaon",
-    gurgaon: "Gurgaon",
-    delhi: "Delhi",
-    mumbai: "Mumbai",
-    bangalore: "Bangalore",
-    noida: "Noida",
-    pune: "Pune",
-  };
-  return map[routeCity?.toLowerCase()] || routeCity;
-};
-
 const Home = () => {
   const [properties, setProperties] = useState([]);
   const [loadingProps, setLoadingProps] = useState(false);
@@ -102,11 +73,10 @@ const Home = () => {
   const [searchLocation, setSearchLocation] = useState("");
   const [selectedLocation, setSelectedLocation] = useState("All");
 
-  // NEW: dynamic cities + microlocations
-  const [cities, setCities] = useState([]); // [{routeSlug:'gurugram', display:'Gurgaon'}]
-  const [selectedCity, setSelectedCity] = useState("gurugram"); // Use route slug
+  const [cities, setCities] = useState([]);
+  const [selectedCity, setSelectedCity] = useState("");
 
-  const [microlocations, setMicrolocations] = useState([]); // [{name,slug}]
+  const [microlocations, setMicrolocations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState("");
 
@@ -120,22 +90,35 @@ const Home = () => {
           signal: controller.signal,
         });
         const citiesData = citiesRes.data?.data || citiesRes.data || [];
-        setCities(
-          citiesData.map((c) => ({
-            routeSlug: toRouteCity(c.city),
-            display: c.displayCity || displayCity(toRouteCity(c.city)),
-            apiCity: c.city.toLowerCase(),
-            _id: c._id,
-          }))
-        );
 
-        const gurgaon = citiesData.find(
-          (c) => c.city.toLowerCase() === "gurgaon"
-        );
-        if (!gurgaon) throw new Error("City Gurgaon not found");
+        const normalized = citiesData.map((c) => ({
+          routeSlug: c.slug || c.city.toLowerCase(),
+          display: c.displayCity || c.city,
+          apiCity: c.city.toLowerCase(),
+          _id: c._id,
+        }));
+        setCities(normalized);
+
+        // pick default city:
+        // 1) isDefault from backend (if you add that),
+        // 2) otherwise first city whose apiCity is "gurgaon" or "gurugram",
+        // 3) otherwise just first city.
+        let defaultCity =
+          normalized.find((c) => c.isDefault) ||
+          normalized.find(
+            (c) => c.apiCity === "gurgaon" || c.apiCity === "gurugram"
+          ) ||
+          normalized[0];
+
+        if (!defaultCity) {
+          setProperties([]);
+          return;
+        }
+
+        setSelectedCity(defaultCity.routeSlug);
 
         const propsRes = await axios.get(
-          `${API_BASE}/api/properties?city=${gurgaon._id}&status=approved`,
+          `${API_BASE}/api/properties?city=${defaultCity._id}&status=approved`,
           { signal: controller.signal }
         );
         setProperties(propsRes.data?.data || []);
@@ -151,130 +134,16 @@ const Home = () => {
     return () => controller.abort();
   }, []);
 
-  // Placeholder properties until a properties API is ready
-  // const properties = useMemo(
-  //   () => [
-  //     {
-  //       id: 1,
-  //       name: "COVIE Gurgaon 42",
-  //       location: "Sector 44, Gurgaon",
-  //       locationSlug: "sector-44",
-  //       propertySlug: "covie-gurgaon-42-sector-44-gurgaon",
-  //       rating: 4.1,
-  //       price: 16000,
-  //       image: propertyImage1,
-  //       tags: ["Digital Nomads", "Entrepreneur"],
-  //     },
-  //     {
-  //       id: 2,
-  //       name: "Covie 108",
-  //       location: "Medicity, Gurgaon",
-  //       locationSlug: "medicity",
-  //       propertySlug: "covie-108-medicity-gurgaon",
-  //       rating: 4.1,
-  //       price: 16000,
-  //       image: propertyImage2,
-  //       tags: ["Digital Nomads", "Entrepreneur"],
-  //     },
-  //     {
-  //       id: 3,
-  //       name: "COVIE Gurgaon 42",
-  //       location: "Sector 44, Gurgaon",
-  //       locationSlug: "sector-44",
-  //       propertySlug: "covie-gurgaon-42-sector-44-gurgaon-2",
-  //       rating: 4.1,
-  //       price: 16000,
-  //       image: propertyImage1,
-  //       tags: ["Digital Nomads", "Entrepreneur"],
-  //     },
-  //     {
-  //       id: 4,
-  //       name: "Covie 108",
-  //       location: "Medicity, Gurgaon",
-  //       locationSlug: "medicity",
-  //       propertySlug: "covie-108-medicity-gurgaon-2",
-  //       rating: 4.1,
-  //       price: 16000,
-  //       image: propertyImage2,
-  //       tags: ["Digital Nomads", "Entrepreneur"],
-  //     },
-  //   ],
-  //   []
-  // );
-
-  // Load cities once
-  // Load cities once
-  // useEffect(() => {
-  //   const controller = new AbortController();
-  //   const load = async () => {
-  //     try {
-  //       setLoading(true);
-  //       setErr("");
-  //       const res = await axios.get(`${API_BASE}/api/cities?all=true`, {
-  //         signal: controller.signal,
-  //       });
-
-  //       // API returns [{_id, city: "gurgaon", displayCity: "Gurgaon", state: {...}}]
-  //       const list = Array.isArray(res.data) ? res.data : res.data?.data || [];
-
-  //       console.log("📦 Cities API response:", list); // Debug log
-
-  //       const normalized = list
-  //         .map((c) => {
-  //           const apiCity = c?.city?.toLowerCase() || "";
-  //           if (!apiCity) return null;
-
-  //           const routeSlug = toRouteCity(apiCity);
-  //           const display = c?.displayCity || displayCity(routeSlug);
-
-  //           return {
-  //             routeSlug,
-  //             display,
-  //             apiCity, // Store original API city name
-  //           };
-  //         })
-  //         .filter(Boolean);
-
-  //       console.log("✅ Normalized cities:", normalized); // Debug log
-
-  //       setCities(normalized);
-
-  //       // IMPORTANT: Set default to Gurgaon (route slug is "gurugram")
-  //       // Only set if not already set
-  //       const defaultCity =
-  //         normalized.find((c) => c.apiCity === "gurgaon") ||
-  //         normalized.find((c) => c.routeSlug === "gurugram") ||
-  //         normalized[0];
-
-  //       if (defaultCity) {
-  //         setSelectedCity(defaultCity.routeSlug);
-  //         console.log("✅ Default city set to:", defaultCity.routeSlug);
-  //       }
-  //     } catch (e) {
-  //       if (e.name !== "CanceledError" && e.name !== "AbortError") {
-  //         console.error("❌ Failed to load cities:", e);
-  //         setErr("Failed to load cities");
-  //         // Fallback to gurgaon if API fails
-  //         setSelectedCity("gurugram");
-  //       }
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   };
-  //   load();
-  //   return () => controller.abort();
-  // }, []);
-
-  // Load microlocations whenever selectedCity changes
   useEffect(() => {
-    if (!selectedCity) return;
+    if (!selectedCity || !cities.length) return;
     const controller = new AbortController();
     const load = async () => {
       try {
         setErr("");
-        const apiCity = toApiCity(selectedCity);
+        const cityObj = cities.find((c) => c.routeSlug === selectedCity);
+        if (!cityObj) return;
         const res = await axios.get(
-          `${API_BASE}/api/microlocations/${apiCity}`,
+          `${API_BASE}/api/microlocations/${cityObj.apiCity}`,
           { signal: controller.signal }
         );
         const raw = Array.isArray(res.data) ? res.data : res.data?.data || [];
@@ -302,55 +171,14 @@ const Home = () => {
     };
     load();
     return () => controller.abort();
-  }, [selectedCity]);
-
-  // useEffect(() => {
-  //   const controller = new AbortController();
-
-  //   const fetchProperties = async () => {
-  //     setLoadingProps(true);
-  //     setErrProps("");
-
-  //     try {
-  //       // Fetch cities to get city object with _id
-  //       const citiesRes = await axios.get(`${API_BASE}/api/cities?all=true`, {
-  //         signal: controller.signal,
-  //       });
-  //       const cities = citiesRes.data?.data || citiesRes.data || [];
-  //       const gurgaonCity = cities.find(
-  //         (c) => c.city === "gurgaon" || c.slug === "gurgaon"
-  //       );
-  //       if (!gurgaonCity) throw new Error("City Gurgaon not found");
-
-  //       // Use city _id for property query
-  //       const cityId = gurgaonCity._id;
-
-  //       const res = await axios.get(
-  //         `${API_BASE}/api/properties?city=${cityId}&status=approved`,
-  //         { signal: controller.signal }
-  //       );
-
-  //       const propertyList = res.data?.data || [];
-  //       setProperties(propertyList);
-  //     } catch (error) {
-  //       if (error.name !== "CanceledError" && error.name !== "AbortError") {
-  //         setErrProps("Failed to load properties");
-  //       }
-  //     } finally {
-  //       setLoadingProps(false);
-  //     }
-  //   };
-
-  //   fetchProperties();
-
-  //   return () => controller.abort();
-  // }, [selectedCity]);
+  }, [selectedCity, cities]);
 
   const handleSearch = (e) => {
     e.preventDefault();
   };
 
-  const displaySelectedCity = displayCity(selectedCity);
+  const selectedCityObj = cities.find((c) => c.routeSlug === selectedCity);
+  const displaySelectedCity = selectedCityObj?.display || selectedCity;
 
   return (
     <>
@@ -360,7 +188,9 @@ const Home = () => {
           <div className={styles.titleSection}>
             <h1 className={styles.mainTitle}>
               Coliving Space in{" "}
-              <span className={styles.locationHighlight}>Gurgaon</span>
+              <span className={styles.locationHighlight}>
+                {displaySelectedCity || "Gurugram"}
+              </span>
             </h1>
             <p className={styles.subtitle}>
               Find your perfect coliving home with fully furnished private or
@@ -476,24 +306,6 @@ const Home = () => {
             </div>
 
             <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
-              {/* <select
-                value={selectedCity}
-                onChange={(e) => setSelectedCity(e.target.value)}
-                style={{
-                  padding: "10px 16px",
-                  borderRadius: "8px",
-                  border: "1px solid #ddd",
-                  fontSize: "14px",
-                  cursor: "pointer",
-                }}
-              >
-                {cities.map((city) => (
-                  <option key={city.routeSlug} value={city.routeSlug}>
-                    {city.display}
-                  </option>
-                ))}
-              </select> */}
-
               <Link
                 to={`/coliving/${selectedCity}`}
                 className={styles.exploreBtn}

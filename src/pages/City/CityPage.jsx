@@ -4,39 +4,11 @@ import { useState, useEffect, useMemo } from "react";
 import axios from "axios";
 import styles from "./CityPage.module.css";
 import rating from "../../assets/star.svg";
-import propertyImage1 from "../../assets/propertyImage1.png";
-import propertyImage2 from "../../assets/propertyImage2.png";
 
-const API_BASE =
-  process.env.REACT_APP_API_BASE ||
-  "https://coliving-gurgaon-backend.onrender.com";
-
-// Map app route slugs → API slugs (backend expects “gurgaon” not “gurugram”)
-const toApiSlug = (slug) => {
-  const s = (slug || "").toLowerCase();
-  if (s === "gurugram") return "gurgaon";
-  return s;
-};
-
-// Display mapping only for headings
-const displayCity = (slug) => {
-  const map = {
-    gurugram: "Gurgaon",
-    gurgaon: "Gurgaon",
-    delhi: "Delhi",
-    mumbai: "Mumbai",
-    bangalore: "Bangalore",
-    noida: "Noida",
-    pune: "Pune",
-  };
-  return map[slug?.toLowerCase()] || slug;
-};
+const API_BASE = process.env.REACT_APP_API_BASE;
 
 export default function CityPage() {
   const { citySlug } = useParams();
-  const apiCity = toApiSlug(citySlug);
-  const cityName = displayCity(citySlug);
-
   const [cityData, setCityData] = useState(null);
   const [properties, setProperties] = useState([]);
   const [microlocations, setMicrolocations] = useState([]);
@@ -71,25 +43,26 @@ export default function CityPage() {
 
     const load = async () => {
       setLoading(true);
-
       try {
-        // 1. Get city details by slug (this returns city _id and more info)
+        // 1. Get city details by route slug (backend should resolve gurgaon/gurugram)
         const cityContentRes = await axios.get(
-          `${API_BASE}/api/cities/${apiCity}`,
-          {
-            signal: controller.signal,
-          }
+          `${API_BASE}/api/cities/${citySlug}`,
+          { signal: controller.signal }
         );
         if (cancelled) return;
 
         const cityContentData = cityContentRes.data;
+        setCityData(cityContentData);
 
-        // 2. Get microlocations based on apiCity slug (like before)
+        // resolve city identifiers from backend
+        const apiCity = (cityContentData.city || "").toLowerCase();
+        const displayCity =
+          cityContentData.displayCity || cityContentData.city || citySlug;
+
+        // 2. Microlocations by apiCity
         const microRes = await axios.get(
           `${API_BASE}/api/microlocations/${apiCity}`,
-          {
-            signal: controller.signal,
-          }
+          { signal: controller.signal }
         );
         if (cancelled) return;
 
@@ -108,10 +81,9 @@ export default function CityPage() {
             return name && slug ? { name, slug } : null;
           })
           .filter(Boolean);
-
         setMicrolocations(normalizedMicros);
 
-        // 3. Get properties using city _id from cityContent API
+        // 3. Properties using city _id from cityContent
         const propertiesRes = await axios.get(
           `${API_BASE}/api/properties?city=${cityContentData._id}&status=approved`,
           { signal: controller.signal }
@@ -121,37 +93,32 @@ export default function CityPage() {
         const propertyList = propertiesRes.data?.data || [];
         setProperties(propertyList);
 
-        // 4. Set cityContent for display, SEO, etc
+        // 4. CityContent (SEO + headings)
         setCityContent({
-          city: cityContentData.city || apiCity,
-          displayCity: cityContentData.displayCity || cityName,
-          title:
-            cityContentData.title ||
-            `Explore Coliving in ${cityContentData.displayCity || cityName}`,
+          city: apiCity,
+          displayCity,
+          title: cityContentData.title || `Explore Coliving in ${displayCity}`,
           description: cityContentData.description || "",
           footerTitle: cityContentData.footerTitle || "",
           footerDescription: cityContentData.footerDescription || "",
           metaTitle:
-            cityContentData.metaTitle ||
-            `Coliving Spaces in ${cityContentData.displayCity || cityName}`,
+            cityContentData.metaTitle || `Coliving Spaces in ${displayCity}`,
           metaDescription:
             cityContentData.metaDescription ||
-            `Find the best coliving spaces in ${
-              cityContentData.displayCity || cityName
-            }.`,
+            `Find the best coliving spaces in ${displayCity}.`,
           schemaMarkup: cityContentData.schemaMarkup || "",
         });
       } catch (error) {
         if (!cancelled) {
-          // Fallbacks in case of error
           setMicrolocations([]);
           setProperties([]);
+          const fallbackDisplay = citySlug;
           setCityContent({
-            city: apiCity,
-            displayCity: cityName,
-            title: `Explore Coliving in ${cityName}`,
-            metaTitle: `Coliving Spaces in ${cityName}`,
-            metaDescription: `Find the best coliving spaces in ${cityName}.`,
+            city: citySlug,
+            displayCity: fallbackDisplay,
+            title: `Explore Coliving in ${fallbackDisplay}`,
+            metaTitle: `Coliving Spaces in ${fallbackDisplay}`,
+            metaDescription: `Find the best coliving spaces in ${fallbackDisplay}.`,
           });
         }
       } finally {
@@ -160,12 +127,11 @@ export default function CityPage() {
     };
 
     load();
-
     return () => {
       cancelled = true;
       controller.abort();
     };
-  }, [citySlug, apiCity, cityName]);
+  }, [citySlug]);
 
   const handleLocationFilter = (location) => {
     setSelectedLocation(location);
@@ -181,14 +147,13 @@ export default function CityPage() {
   return (
     <>
       <div className={styles.cityPage}>
-        {/* Breadcrumb */}
         <div className={styles.breadcrumb}>
           <div className={`container ${styles.container}`}>
             <Link to="/" className={styles.breadcrumbLink}>
               Home
             </Link>
             <span className={styles.breadcrumbSeparator}>/</span>
-            <span className={styles.breadcrumbCurrent}>{cityName}</span>
+            <span className={styles.breadcrumbCurrent}>{cityContent.displayCity || citySlug}</span>
           </div>
         </div>
 
@@ -197,7 +162,7 @@ export default function CityPage() {
           <div className={`container ${styles.container}`}>
             <div className={styles.headerContent}>
               <h1 className={styles.pageTitle}>
-                Coliving Spaces in {cityContent.displayCity || cityName}
+                Coliving Spaces in {cityContent.displayCity || citySlug}
               </h1>
               <button className={styles.filtersBtn} onClick={toggleFilters}>
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none">

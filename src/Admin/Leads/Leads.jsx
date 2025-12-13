@@ -4,9 +4,7 @@ import axios from "axios";
 import { ClipLoader } from "react-spinners";
 import styles from "../Cities/Cities.module.css";
 
-const API_BASE =
-  process.env.REACT_APP_API_BASE ||
-  "https://coliving-gurgaon-backend.onrender.com";
+const API_BASE = process.env.REACT_APP_API_BASE;
 
 export default function Leads() {
   const [rows, setRows] = useState([]);

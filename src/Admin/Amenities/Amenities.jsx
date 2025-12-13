@@ -4,9 +4,12 @@ import axios from "axios";
 import { ClipLoader } from "react-spinners";
 import styles from "../Cities/Cities.module.css";
 import PlanModal from "../Plans/PlanModal"; // reuse the same accessible modal
+import Edit from '../../assets/Edit.svg'
+import Delete from '../../assets/Delete.svg'
+import Enable from '../../assets/Enable.svg'
+import Disable from '../../assets/Disable.svg'
 
-const API_BASE =
-  process.env.REACT_APP_API_BASE || "https://coliving-gurgaon-backend.onrender.com";
+const API_BASE = process.env.REACT_APP_API_BASE;
 
 const Amenities = () => {
   const [items, setItems] = useState([]);
@@ -224,10 +227,10 @@ const Amenities = () => {
         <table className={styles.table}>
           <thead>
             <tr>
-              <th style={{ width: "30%" }}>Name</th>
-              <th style={{ width: "20%" }}>Icon</th>
+              <th style={{ width: "40%" }}>Name</th>
+              <th style={{ width: "30%" }}>Icon</th>
               <th style={{ width: "15%" }}>Enabled</th>
-              <th style={{ width: "35%" }}>Actions</th>
+              <th style={{ width: "15%" }}>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -253,21 +256,21 @@ const Amenities = () => {
                       className={styles.editButton}
                       disabled={loading}
                     >
-                      Edit
+                      <img src={Edit} />
                     </button>
                     <button
                       onClick={() => onToggleEnabled(a)}
-                      className={styles.addButton}
+                      className={styles.statusButton}
                       disabled={loading}
                     >
-                      {a.enabled ? "Disable" : "Enable"}
+                      {a.enabled ? <img src={Enable} /> : <img src={Disable} />}
                     </button>
                     <button
                       onClick={() => onDelete(a)}
                       className={styles.deleteButton}
                       disabled={loading}
                     >
-                      Delete
+                      <img src={Delete} />
                     </button>
                   </div>
                 </td>
@@ -351,10 +354,10 @@ const Amenities = () => {
           </label>
 
           <div style={{ display: "flex", gap: 10, marginTop: 6 }}>
-            <button className={styles.addButton} onClick={createAmenity} disabled={loading}>
+            <button className="btn primaryBtn" onClick={createAmenity} disabled={loading}>
               Save Amenity
             </button>
-            <button className={styles.cancelButton} onClick={handleCloseAdd}>
+            <button className="btn secondaryBtn" onClick={handleCloseAdd}>
               Cancel
             </button>
           </div>
@@ -431,10 +434,10 @@ const Amenities = () => {
           </label>
 
           <div style={{ display: "flex", gap: 10, marginTop: 6 }}>
-            <button className={styles.addButton} onClick={saveEditAmenity} disabled={loading}>
+            <button className="btn primaryBtn" onClick={saveEditAmenity} disabled={loading}>
               Save Changes
             </button>
-            <button className={styles.cancelButton} onClick={() => setIsEditOpen(false)}>
+            <button className="btn secondaryBtn" onClick={() => setIsEditOpen(false)}>
               Cancel
             </button>
           </div>

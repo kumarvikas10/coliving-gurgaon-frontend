@@ -4,9 +4,9 @@
 :root {
   margin: 0;
   padding: 0;
-  box-sizing: border-box; 
+  box-sizing: border-box;
   --primary-color: #6376E8;
-  --primary-black:#161616;
+  --primary-black: #161616;
   --secondary-black: #868585;
   --background-color: #EDEFFF;
   --body-fonts: "Encode Sans Semi Condensed", sans-serif;
@@ -20,26 +20,64 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-family: "Encode Sans Semi Condensed", sans-serif;
 }
 
-.navbar .navbar-collapse{
-    flex-grow: 0 !important;
+.navbar .navbar-collapse {
+  flex-grow: 0 !important;
 }
 
-.dropdown-menu li a{
-text-transform: capitalize !important;
+.dropdown-menu li a {
+  text-transform: capitalize !important;
 }
 
 .container {
-  width: 100%;               /* Full width of screen by default */
-  max-width: 1440px;         /* Your maximum readable content width */
-  margin-left: auto;         /* Center horizontally */
+  width: 100%;
+  max-width: 1440px;
+  margin-left: auto;
   margin-right: auto;
-  padding-left: 60px;        /* Horizontal padding for spacing */
+  padding-left: 60px;
   padding-right: 60px;
   box-sizing: border-box;
+}
+
+.btn {
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.primaryBtn {
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+.primaryBtn:hover {
+  background: #5A6BCE;
+  color: white;
+
+}
+
+.secondaryBtn {
+  background: transparent;
+  border: 1px solid var(--primary-color);
+  color: var(--primary-color);
+}
+
+.secondaryBtn:hover {
+  background: var(--primary-color);
+  color: white;
 }
 
 /* Medium devices (tablets, landscape phones) */

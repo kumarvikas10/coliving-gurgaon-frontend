@@ -3,8 +3,10 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import styles from "./Cities.module.css";
 import { ClipLoader } from "react-spinners";
+import Edit from '../../assets/Edit.svg'
+import Delete from '../../assets/Delete.svg'
 
-const API_BASE = process.env.REACT_APP_API_BASE || "https://coliving-gurgaon-backend.onrender.com";
+const API_BASE = process.env.REACT_APP_API_BASE;
 
 export default function Cities() {
   const [cities, setCities] = useState([]);
@@ -133,7 +135,7 @@ export default function Cities() {
             </option>
           ))}
         </select>
-        <button onClick={handleAddOrSaveCity} className={styles.addButton} disabled={loading}>
+        <button onClick={handleAddOrSaveCity} className="btn primaryBtn" disabled={loading}>
           {editingCity ? "Save" : "Add City"}
         </button>
         {editingCity && (
@@ -159,7 +161,7 @@ export default function Cities() {
                 <td>{c?.state?.displayState || c?.state?.state || "-"}</td>
                 <td>
                   <button onClick={() => handleEditClick(c)} className={styles.editButton} disabled={loading}>
-                    Edit
+                    <img src={Edit} />
                   </button>
                   <button
                     onClick={() => handleDeleteCity(c.city)}
@@ -167,7 +169,7 @@ export default function Cities() {
                     disabled={loading}
                     style={{ marginLeft: 8 }}
                   >
-                    Delete
+                    <img src={Delete} />
                   </button>
                 </td>
               </tr>

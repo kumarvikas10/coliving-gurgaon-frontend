@@ -20,6 +20,7 @@
 
 .locationHighlight {
   color: var(--primary-color);
+  text-transform: capitalize;
 }
 
 .subtitle {

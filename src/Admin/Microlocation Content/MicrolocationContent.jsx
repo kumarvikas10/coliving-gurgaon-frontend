@@ -6,7 +6,7 @@ import { ClipLoader } from "react-spinners";
 import { useQuill } from "react-quilljs";
 import "quill/dist/quill.snow.css";
 
-const API_BASE = process.env.REACT_APP_API_BASE || "https://coliving-gurgaon-backend.onrender.com";
+const API_BASE = process.env.REACT_APP_API_BASE;
 
 export default function MicrolocationContent() {
   const [cities, setCities] = useState([]);              // [{ _id, city, displayCity }]
@@ -236,12 +236,12 @@ export default function MicrolocationContent() {
       </div>
 
       {!isEditing && (
-        <button className={styles.btn} onClick={() => setIsEditing(true)} disabled={loading}>
+        <button className="btn secondaryBtn" onClick={() => setIsEditing(true)} disabled={loading}>
           Edit
         </button>
       )}
       {isEditing && (
-        <button className={styles.btn} onClick={handleSave} disabled={loading}>
+        <button className="btn primaryBtn" onClick={handleSave} disabled={loading}>
           Save Changes
         </button>
       )}

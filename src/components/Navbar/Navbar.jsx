@@ -5,8 +5,7 @@ import axios from "axios";
 import styles from "./Navbar.module.css";
 import Logo from "../../assets/logo.svg";
 
-const API_BASE =
-  process.env.REACT_APP_API_BASE || "https://coliving-gurgaon-backend.onrender.com";
+const API_BASE = process.env.REACT_APP_API_BASE;
 
 function Navbar() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -18,22 +17,36 @@ function Navbar() {
     setLoading(true);
     setErr("");
     try {
-      const res = await axios.get(`${API_BASE}/api/cities`, {
-        signal: controller.signal, // AbortController (axios v1) for safe cleanup
+      const res = await axios.get(`${API_BASE}/api/cities?all=true`, {
+        signal: controller.signal,
       });
       const data = Array.isArray(res.data) ? res.data : res.data?.data || [];
-      // Normalize to { name, slug }
-      const normalized = data
+
+      // Normalize cities from backend
+      const normalizedAll = data
         .map((c) => {
-          const name = c.name ?? c.city ?? "";
-          // Prefer backend slug if present; otherwise derive a simple slug
-          let slug = c.slug ?? name.toLowerCase().trim().replace(/\s+/g, "-");
-          // Special case mapping if needed
-          if (!c.slug && name.toLowerCase() === "gurgaon") slug = "gurugram";
-          return name && slug ? { name, slug } : null;
+          const cityName = c.name ?? c.city ?? "";
+          if (!cityName) return null;
+
+          // Use backend slug if present; otherwise derive a slug from city field
+          const slug =
+            c.slug || cityName.toLowerCase().trim().replace(/\s+/g, "-");
+
+          return {
+            name: c.displayCity || cityName, // label in UI (Gurgaon/Gurugram)
+            slug, // route segment (/coliving/<slug>)
+            apiCity: (c.city || cityName).toLowerCase(),
+          };
         })
         .filter(Boolean);
-      setCities(normalized);
+
+      // Keep only the Gurgaon/Gurugram city from backend
+      const gurgaonCity =
+        normalizedAll.find(
+          (c) => c.apiCity === "gurgaon" || c.apiCity === "gurugram"
+        ) || normalizedAll[0]; // fallback to first if needed
+
+      setCities(gurgaonCity ? [gurgaonCity] : []);
     } catch (e) {
       if (e.name !== "CanceledError" && e.name !== "AbortError") {
         setErr(e.message || "Failed to load cities");
@@ -56,7 +69,8 @@ function Navbar() {
   const menuItems = useMemo(() => {
     if (loading) return <li className="px-3 py-2 text-muted">Loading…</li>;
     if (err) return <li className="px-3 py-2 text-danger">Failed to load</li>;
-    if (!cities.length) return <li className="px-3 py-2 text-muted">No cities</li>;
+    if (!cities.length)
+      return <li className="px-3 py-2 text-muted">No cities</li>;
     return (
       <>
         {cities.map((city) => (
@@ -70,22 +84,22 @@ function Navbar() {
             </Link>
           </li>
         ))}
-        {/* <li><hr className="dropdown-divider" /></li>
-        <li>
-          <Link to="/coliving" className="dropdown-item" onClick={closeDropdown}>
-            <strong>View All Cities</strong>
-          </Link>
-        </li> */}
       </>
     );
   }, [cities, loading, err]);
 
   return (
     <section>
-      <nav className={`${styles.navbar} navbar navbar-expand-lg bg-body-tertiary`}>
+      <nav
+        className={`${styles.navbar} navbar navbar-expand-lg bg-body-tertiary`}
+      >
         <div className="container-fluid">
           <div>
-            <NavLink to="/" className="nav-link active nav-item" aria-current="page">
+            <NavLink
+              to="/"
+              className="nav-link active nav-item"
+              aria-current="page"
+            >
               <img className={styles.logo} src={Logo} alt="logo" />
             </NavLink>
           </div>
@@ -117,7 +131,9 @@ function Navbar() {
               </li>
 
               {/* Dynamic Locations */}
-              <li className={`nav-item dropdown ${isDropdownOpen ? "show" : ""}`}>
+              <li
+                className={`nav-item dropdown ${isDropdownOpen ? "show" : ""}`}
+              >
                 <button
                   className={`${styles.navbarItem} nav-link dropdown-toggle`}
                   onClick={toggleDropdown}

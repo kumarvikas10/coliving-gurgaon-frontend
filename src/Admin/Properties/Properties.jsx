@@ -3,8 +3,14 @@ import { useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import { ClipLoader } from "react-spinners";
 import styles from "../Cities/Cities.module.css";
+import View from "../../assets/Eye.svg";
+import Edit from "../../assets/Edit.svg";
+import Delete from "../../assets/Delete.svg";
+import Enable from "../../assets/Enable.svg";
+import Disable from "../../assets/Disable.svg";
 
-const API_BASE = process.env.REACT_APP_API_BASE || "https://coliving-gurgaon-backend.onrender.com";
+const API_BASE = process.env.REACT_APP_API_BASE;
+const FRONTEND_BASE = process.env.REACT_APP_FRONTEND_BASE;
 
 export default function Properties({ goToAdd, goToEdit }) {
   const [rows, setRows] = useState([]);
@@ -23,7 +29,11 @@ export default function Properties({ goToAdd, goToEdit }) {
 
   // Adapt helpers reused from PropertyAdd
   const adaptCities = (raw) => {
-    const list = Array.isArray(raw?.data) ? raw.data : Array.isArray(raw) ? raw : raw?.data?.data || [];
+    const list = Array.isArray(raw?.data)
+      ? raw.data
+      : Array.isArray(raw)
+      ? raw
+      : raw?.data?.data || [];
     return list
       .map((c) => ({
         id: c._id || c.id || c.city_id,
@@ -35,9 +45,17 @@ export default function Properties({ goToAdd, goToEdit }) {
   };
 
   const adaptMicros = (raw) => {
-    const list = Array.isArray(raw?.data) ? raw.data : Array.isArray(raw) ? raw : raw?.data?.data || [];
+    const list = Array.isArray(raw?.data)
+      ? raw.data
+      : Array.isArray(raw)
+      ? raw
+      : raw?.data?.data || [];
     return list
-      .map((m) => ({ id: m._id || m.id, name: m.name || m.slug, slug: m.slug || "" }))
+      .map((m) => ({
+        id: m._id || m.id,
+        name: m.name || m.slug,
+        slug: m.slug || "",
+      }))
       .filter((x) => x.id && x.name);
   };
 
@@ -75,9 +93,13 @@ export default function Properties({ goToAdd, goToEdit }) {
       if (!filterCity) return;
       try {
         // Same pattern as PropertyAdd: supports citySlug or cityId
-        const cityMeta = cities.find((c) => String(c.id) === String(filterCity));
+        const cityMeta = cities.find(
+          (c) => String(c.id) === String(filterCity)
+        );
         const key = cityMeta?.slug || filterCity;
-        const res = await axios.get(`${API_BASE}/api/microlocations/${encodeURIComponent(key)}`);
+        const res = await axios.get(
+          `${API_BASE}/api/microlocations/${encodeURIComponent(key)}`
+        );
         setMicros(adaptMicros(res.data || res));
       } catch (e) {
         console.error(e);
@@ -93,8 +115,8 @@ export default function Properties({ goToAdd, goToEdit }) {
     setErr("");
     try {
       const params = new URLSearchParams();
-      params.set("all", "true");       // keep admin-all
-      params.set("deleted", "true");   // include archived in list
+      params.set("all", "true"); // keep admin-all
+      params.set("deleted", "true"); // include archived in list
 
       if (searchDebounced) params.set("search", searchDebounced);
       if (filterCity) params.set("city", filterCity);
@@ -124,7 +146,9 @@ export default function Properties({ goToAdd, goToEdit }) {
     const next = p.status === "approved" ? "archived" : "approved";
     setLoading(true);
     try {
-      await axios.patch(`${API_BASE}/api/properties/${p._id}/status`, { status: next });
+      await axios.patch(`${API_BASE}/api/properties/${p._id}/status`, {
+        status: next,
+      });
       await fetchRows();
     } catch (e) {
       console.error(e);
@@ -161,7 +185,8 @@ export default function Properties({ goToAdd, goToEdit }) {
     const arr = p?.location?.micro_locations || [];
     if (!arr.length) return "-";
     const first = arr[0];
-    if (typeof first === "object") return first.name || first.slug || first._id || "-";
+    if (typeof first === "object")
+      return first.name || first.slug || first._id || "-";
     return String(first);
   };
 
@@ -180,15 +205,53 @@ export default function Properties({ goToAdd, goToEdit }) {
     setFilterStatus("");
   };
 
+  const getCitySlugForRoute = (p) => {
+    const c = p?.location?.city;
+    if (!c) return "";
+    if (typeof c === "object") {
+      return c.slug || (c.city || c.name || "").toLowerCase();
+    }
+    return String(c).toLowerCase();
+  };
+
+  const buildFrontendUrl = (p) => {
+    const citySlug = getCitySlugForRoute(p);
+    if (!citySlug || !p.slug) return FRONTEND_BASE;
+    return `${FRONTEND_BASE}/${encodeURIComponent(
+      citySlug
+    )}/${encodeURIComponent(p.slug)}`;
+  };
+
   return (
     <div className={styles.pageWrapper}>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: 12,
+        }}
+      >
         <h2 className={styles.heading}>Coliving Properties</h2>
-        <button className={styles.addButton} onClick={goToAdd} disabled={loading}>+ Add Coliving</button>
+        <button
+          className={styles.addButton}
+          onClick={goToAdd}
+          disabled={loading}
+        >
+          + Add Coliving
+        </button>
       </div>
 
       {/* Filters toolbar */}
-      <div style={{ display: "flex", gap: 10, alignItems: "center", margin: "12px 0", flexWrap: "wrap" }}>
+      <div
+        style={{
+          display: "flex",
+          gap: 10,
+          alignItems: "center",
+          margin: "12px 0",
+          flexWrap: "wrap",
+        }}
+      >
         <input
           className={styles.input}
           style={{ minWidth: 220 }}
@@ -203,7 +266,9 @@ export default function Properties({ goToAdd, goToEdit }) {
         >
           <option value="">All cities</option>
           {cities.map((c) => (
-            <option key={c.id} value={c.id}>{c.name}</option>
+            <option key={c.id} value={c.id}>
+              {c.name}
+            </option>
           ))}
         </select>
         <select
@@ -214,7 +279,9 @@ export default function Properties({ goToAdd, goToEdit }) {
         >
           <option value="">All microlocations</option>
           {micros.map((m) => (
-            <option key={m.id} value={m.id}>{m.name}</option>
+            <option key={m.id} value={m.id}>
+              {m.name}
+            </option>
           ))}
         </select>
         <select
@@ -229,8 +296,20 @@ export default function Properties({ goToAdd, goToEdit }) {
           <option value="rejected">Rejected</option>
           <option value="archived">Archived</option>
         </select>
-        <button className={styles.addButton} onClick={fetchRows} disabled={loading}>Apply</button>
-        <button className={styles.cancelButton} onClick={clearFilters} disabled={loading}>Clear</button>
+        <button
+          className="btn primaryBtn"
+          onClick={fetchRows}
+          disabled={loading}
+        >
+          Apply
+        </button>
+        <button
+          className="btn secondaryBtn"
+          onClick={clearFilters}
+          disabled={loading}
+        >
+          Clear
+        </button>
       </div>
 
       <div className={styles.contentWrapper}>
@@ -258,19 +337,44 @@ export default function Properties({ goToAdd, goToEdit }) {
                 <td>{fmtDate(p.createdAt)}</td>
                 <td>{p.status || "-"}</td>
                 <td>
-                  <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                  <div style={{ display: "flex", gap: 8 }}>
                     <button
-                      onClick={() => { console.log("[Properties] goToEdit id:", p._id); goToEdit && goToEdit(p._id); }}
+                      onClick={() => {
+                        const url = buildFrontendUrl(p);
+                        window.open(url, "_blank", "noopener,noreferrer");
+                      }}
                       className={styles.editButton}
                       disabled={loading}
                     >
-                      Edit
+                      <img src={View} alt="View" />
                     </button>
-                    <button onClick={() => onToggleStatus(p)} className={styles.addButton} disabled={loading}>
-                      {p.status === "approved" ? "Disable" : "Enable"}
+                    <button
+                      onClick={() => {
+                        console.log("[Properties] goToEdit id:", p._id);
+                        goToEdit && goToEdit(p._id);
+                      }}
+                      className={styles.editButton}
+                      disabled={loading}
+                    >
+                      <img src={Edit} />
                     </button>
-                    <button onClick={() => onDelete(p)} className={styles.deleteButton} disabled={loading}>
-                      Delete
+                    <button
+                      onClick={() => onToggleStatus(p)}
+                      className={styles.statusButton}
+                      disabled={loading}
+                    >
+                      {p.status === "approved" ? (
+                        <img src={Enable} />
+                      ) : (
+                        <img src={Disable} />
+                      )}
+                    </button>
+                    <button
+                      onClick={() => onDelete(p)}
+                      className={styles.deleteButton}
+                      disabled={loading}
+                    >
+                      <img src={Delete} />
                     </button>
                   </div>
                 </td>
@@ -278,7 +382,9 @@ export default function Properties({ goToAdd, goToEdit }) {
             ))}
             {!rows.length && !loading && (
               <tr>
-                <td colSpan={8} style={{ textAlign: "center", color: "#777" }}>No properties found</td>
+                <td colSpan={8} style={{ textAlign: "center", color: "#777" }}>
+                  No properties found
+                </td>
               </tr>
             )}
           </tbody>

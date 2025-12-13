@@ -5,6 +5,8 @@ import { ClipLoader } from "react-spinners";
 import { useQuill } from 'react-quilljs';
 import 'quill/dist/quill.snow.css';
 
+const API_BASE = process.env.REACT_APP_API_BASE;
+
 const CityContent = () => {
   const [cities, setCities] = useState([]);
   const [selectedCity, setSelectedCity] = useState("");
@@ -26,7 +28,7 @@ const CityContent = () => {
     setLoading(true);
     try {
       const res = await axios.get(
-        `https://coliving-gurgaon-backend.onrender.com/api/cities`
+        `${API_BASE}/api/cities`
       );
       setCities(res.data);
 
@@ -44,7 +46,7 @@ const CityContent = () => {
     setLoading(true);
     try {
       const res = await axios.get(
-        `https://coliving-gurgaon-backend.onrender.com/api/cities/${city}`
+        `${API_BASE}/api/cities/${city}`
       );
 
       setTitle(res.data.title || "");
@@ -71,7 +73,7 @@ const CityContent = () => {
     setLoading(true);
     try {
       await axios.post(
-        `https://coliving-gurgaon-backend.onrender.com/api/admin/cities`,
+        `${API_BASE}/api/admin/cities`,
         {
           city: selectedCity,
           title,
@@ -224,12 +226,12 @@ useEffect(() => {
       </div>
 
       {!isEditing && (
-        <button className={styles.btn} onClick={() => setIsEditing(true)} disabled={loading}>
+        <button className="btn secondaryBtn" onClick={() => setIsEditing(true)} disabled={loading}>
           Edit
         </button>
       )}
       {isEditing && (
-        <button className={styles.btn} onClick={handleSave} disabled={loading}>
+        <button className="btn primaryBtn" onClick={handleSave} disabled={loading}>
           Save Changes
         </button>
       )}

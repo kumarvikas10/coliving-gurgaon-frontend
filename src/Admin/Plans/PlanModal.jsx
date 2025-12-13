@@ -73,7 +73,7 @@ export default function PlanModal({ open, title, onClose, children }) {
       >
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
           <h3 id="plan-modal-title" style={{ margin: 0 }}>{title || "Add Plan"}</h3>
-          <button onClick={() => onCloseRef.current?.()} aria-label="Close dialog">✕</button>
+          <button style={{border:"none", background:"none"}} onClick={() => onCloseRef.current?.()} aria-label="Close dialog">✕</button>
         </div>
         <div id="plan-modal-desc" style={{ marginTop: 6, marginBottom: 12 }}>
           Fill in the plan details below.

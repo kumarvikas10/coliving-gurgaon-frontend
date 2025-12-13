@@ -16,9 +16,7 @@ import Zoom from "yet-another-react-lightbox/plugins/zoom";
 import Fullscreen from "yet-another-react-lightbox/plugins/fullscreen";
 import "yet-another-react-lightbox/plugins/thumbnails.css";
 
-const API_BASE =
-  process.env.REACT_APP_API_BASE ||
-  "https://coliving-gurgaon-backend.onrender.com";
+const API_BASE = process.env.REACT_APP_API_BASE;
 
 const PropertyPage = () => {
   const { citySlug, propertySlug } = useParams();
@@ -48,18 +46,6 @@ const PropertyPage = () => {
   }, [property?.description]);
 
   const MAX_THUMBNAILS = 4;
-
-  const cityNameMapping = {
-    gurugram: "Gurgaon",
-    gurgaon: "Gurgaon",
-    delhi: "Delhi",
-    mumbai: "Mumbai",
-    bangalore: "Bangalore",
-    noida: "Noida",
-    pune: "Pune",
-  };
-
-  const cityName = cityNameMapping[citySlug] || citySlug;
 
   useEffect(() => {
     if (!propertySlug) return;
@@ -212,8 +198,11 @@ const PropertyPage = () => {
             Home
           </Link>
           <span className={styles.breadcrumbSeparator}>/</span>
-          <Link to={`/coliving/${citySlug}`} className={styles.breadcrumbLink}>
-            {cityName}
+          <Link
+            to={`/coliving/${property.city?.slug || citySlug}`}
+            className={styles.breadcrumbLink}
+          >
+            {property.city?.displayCity || property.city?.city || citySlug}
           </Link>
           <span className={styles.breadcrumbSeparator}>/</span>
           <span className={styles.breadcrumbCurrent}>{property.name}</span>
