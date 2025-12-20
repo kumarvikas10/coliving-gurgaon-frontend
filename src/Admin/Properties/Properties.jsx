@@ -234,7 +234,7 @@ export default function Properties({ goToAdd, goToEdit }) {
       >
         <h2 className={styles.heading}>Coliving Properties</h2>
         <button
-          className={styles.addButton}
+          className="btn primaryBtn"
           onClick={goToAdd}
           disabled={loading}
         >
