@@ -195,7 +195,7 @@ export default function Microlocations() {
                         className={styles.editButton}
                         disabled={loading}
                       >
-                        <img src={Edit} />
+                        <img src={Edit} alt="Edit" />
                       </button>
                       <button
                         onClick={() => handleDelete(m._id)}
@@ -203,7 +203,7 @@ export default function Microlocations() {
                         disabled={loading}
                         style={{ marginLeft: 8 }}
                       >
-                        <img src={Delete} />
+                        <img src={Delete} alt="Delete" />
                       </button>
                     </td>
                   </tr>

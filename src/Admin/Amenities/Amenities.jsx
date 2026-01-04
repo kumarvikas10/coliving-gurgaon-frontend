@@ -4,10 +4,10 @@ import axios from "axios";
 import { ClipLoader } from "react-spinners";
 import styles from "../Cities/Cities.module.css";
 import PlanModal from "../Plans/PlanModal"; // reuse the same accessible modal
-import Edit from '../../assets/Edit.svg'
-import Delete from '../../assets/Delete.svg'
-import Enable from '../../assets/Enable.svg'
-import Disable from '../../assets/Disable.svg'
+import Edit from "../../assets/Edit.svg";
+import Delete from "../../assets/Delete.svg";
+import Enable from "../../assets/Enable.svg";
+import Disable from "../../assets/Disable.svg";
 
 const API_BASE = process.env.REACT_APP_API_BASE;
 
@@ -205,7 +205,8 @@ const Amenities = () => {
   useEffect(() => {
     return () => {
       if (lastPreviewUrl.current) URL.revokeObjectURL(lastPreviewUrl.current);
-      if (lastEditPreviewUrl.current) URL.revokeObjectURL(lastEditPreviewUrl.current);
+      if (lastEditPreviewUrl.current)
+        URL.revokeObjectURL(lastEditPreviewUrl.current);
     };
   }, []);
 
@@ -216,9 +217,20 @@ const Amenities = () => {
 
   return (
     <div className={styles.pageWrapper}>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: 12,
+        }}
+      >
         <h2 className={styles.heading}>Manage Amenities</h2>
-        <button className={styles.addButton} onClick={openAdd} disabled={loading}>
+        <button
+          className={styles.addButton}
+          onClick={openAdd}
+          disabled={loading}
+        >
           + Add Amenity
         </button>
       </div>
@@ -256,21 +268,21 @@ const Amenities = () => {
                       className={styles.editButton}
                       disabled={loading}
                     >
-                      <img src={Edit} />
+                      <img src={Edit} alt="Edit" />
                     </button>
                     <button
                       onClick={() => onToggleEnabled(a)}
                       className={styles.statusButton}
                       disabled={loading}
                     >
-                      {a.enabled ? <img src={Enable} /> : <img src={Disable} />}
+                      {a.enabled ? <img src={Enable} alt="Enable" /> : <img src={Disable} alt="Disable" />}
                     </button>
                     <button
                       onClick={() => onDelete(a)}
                       className={styles.deleteButton}
                       disabled={loading}
                     >
-                      <img src={Delete} />
+                      <img src={Delete} alt="Delete" />
                     </button>
                   </div>
                 </td>
@@ -323,7 +335,12 @@ const Amenities = () => {
               <img
                 src={previewUrl}
                 alt="Icon preview"
-                style={{ maxHeight: 48, border: "1px solid #eee", borderRadius: 6, padding: 4 }}
+                style={{
+                  maxHeight: 48,
+                  border: "1px solid #eee",
+                  borderRadius: 6,
+                  padding: 4,
+                }}
               />
               <div style={{ marginTop: 8 }}>
                 <button
@@ -344,7 +361,9 @@ const Amenities = () => {
             </div>
           ) : null}
 
-          <label style={{ display: "inline-flex", gap: 8, alignItems: "center" }}>
+          <label
+            style={{ display: "inline-flex", gap: 8, alignItems: "center" }}
+          >
             <input
               type="checkbox"
               checked={formEnabled}
@@ -354,7 +373,11 @@ const Amenities = () => {
           </label>
 
           <div style={{ display: "flex", gap: 10, marginTop: 6 }}>
-            <button className="btn primaryBtn" onClick={createAmenity} disabled={loading}>
+            <button
+              className="btn primaryBtn"
+              onClick={createAmenity}
+              disabled={loading}
+            >
               Save Amenity
             </button>
             <button className="btn secondaryBtn" onClick={handleCloseAdd}>
@@ -365,7 +388,11 @@ const Amenities = () => {
       </PlanModal>
 
       {/* Edit Amenity */}
-      <PlanModal open={isEditOpen} onClose={() => setIsEditOpen(false)} title="Edit Amenity">
+      <PlanModal
+        open={isEditOpen}
+        onClose={() => setIsEditOpen(false)}
+        title="Edit Amenity"
+      >
         <div style={{ display: "grid", gap: 12 }}>
           <label style={{ display: "grid", gap: 6 }}>
             <span>Name</span>
@@ -379,11 +406,18 @@ const Amenities = () => {
 
           {iconUrl && !editPreviewUrl && (
             <div>
-              <span style={{ display: "block", marginBottom: 6 }}>Current Icon</span>
+              <span style={{ display: "block", marginBottom: 6 }}>
+                Current Icon
+              </span>
               <img
                 src={iconUrl}
                 alt="Current icon"
-                style={{ maxHeight: 48, border: "1px solid #eee", borderRadius: 6, padding: 4 }}
+                style={{
+                  maxHeight: 48,
+                  border: "1px solid #eee",
+                  borderRadius: 6,
+                  padding: 4,
+                }}
               />
             </div>
           )}
@@ -403,7 +437,12 @@ const Amenities = () => {
               <img
                 src={editPreviewUrl}
                 alt="New icon preview"
-                style={{ maxHeight: 48, border: "1px solid #eee", borderRadius: 6, padding: 4 }}
+                style={{
+                  maxHeight: 48,
+                  border: "1px solid #eee",
+                  borderRadius: 6,
+                  padding: 4,
+                }}
               />
               <div style={{ marginTop: 8 }}>
                 <button
@@ -424,7 +463,9 @@ const Amenities = () => {
             </div>
           )}
 
-          <label style={{ display: "inline-flex", gap: 8, alignItems: "center" }}>
+          <label
+            style={{ display: "inline-flex", gap: 8, alignItems: "center" }}
+          >
             <input
               type="checkbox"
               checked={enabled}
@@ -434,10 +475,17 @@ const Amenities = () => {
           </label>
 
           <div style={{ display: "flex", gap: 10, marginTop: 6 }}>
-            <button className="btn primaryBtn" onClick={saveEditAmenity} disabled={loading}>
+            <button
+              className="btn primaryBtn"
+              onClick={saveEditAmenity}
+              disabled={loading}
+            >
               Save Changes
             </button>
-            <button className="btn secondaryBtn" onClick={() => setIsEditOpen(false)}>
+            <button
+              className="btn secondaryBtn"
+              onClick={() => setIsEditOpen(false)}
+            >
               Cancel
             </button>
           </div>

@@ -20,7 +20,6 @@ const API_BASE = process.env.REACT_APP_API_BASE;
 
 const PropertyPage = () => {
   const { citySlug, propertySlug } = useParams();
-  const [cityData, setCityData] = useState(null);
   const [property, setProperty] = useState(null);
   const [loading, setLoading] = useState(true);
   const [allAmenities, setAllAmenities] = useState([]);
@@ -155,39 +154,12 @@ const PropertyPage = () => {
     );
   }
 
-  // Get thumbnails to display (images 1-4, skipping the main image at index 0)
-  const thumbnailsToShow = property.images.slice(1, MAX_THUMBNAILS + 1);
-  const remainingImagesCount = Math.max(
-    0,
-    property.images.length - MAX_THUMBNAILS - 1
-  );
   const formatINR = (n) =>
     n == null
       ? ""
       : new Intl.NumberFormat("en-IN", { maximumFractionDigits: 0 }).format(
           Number(n)
         );
-
-  const resolveRoomImage = (img, prop) => {
-    const first = prop && prop.images && prop.images ? prop.images : "";
-
-    if (!img) return first;
-
-    if (
-      typeof img === "string" &&
-      (img.startsWith("http") || img.startsWith("data:") || img.startsWith("/"))
-    ) {
-      return img;
-    }
-
-    const map = {
-      "private-room.jpg": first,
-      "double-sharing.jpg":
-        prop && prop.images && prop.images[17] ? prop.images[17] : first,
-    };
-
-    return map[img] ? map[img] : first;
-  };
 
   return (
     <div className={styles.propertyPage}>
@@ -429,7 +401,7 @@ const PropertyPage = () => {
                             property.images.length > index ? (
                               <img
                                 src={property.images[index].secureUrl}
-                                alt={`${property.name} Image ${index + 1}`}
+                                alt={property.name}
                               />
                             ) : (
                               <img src="/default-room.jpg" alt="Default Room" />

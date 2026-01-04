@@ -190,41 +190,41 @@ const Plans = () => {
     }
   };
 
-  const onSubmit = async () => {
-    if (!type.trim()) {
-      alert("Please enter plan type");
-      return;
-    }
-    setLoading(true);
-    setErr("");
-    try {
-      const payload = { type: type.trim(), description, enabled };
-      await axios.put(`${API_BASE}/api/plans/${editingId}`, payload);
-      resetForm();
-      fetchPlans();
-    } catch (e) {
-      console.error(e);
-      setErr("Failed to save plan");
-    } finally {
-      setLoading(false);
-    }
-  };
+  // const onSubmit = async () => {
+  //   if (!type.trim()) {
+  //     alert("Please enter plan type");
+  //     return;
+  //   }
+  //   setLoading(true);
+  //   setErr("");
+  //   try {
+  //     const payload = { type: type.trim(), description, enabled };
+  //     await axios.put(`${API_BASE}/api/plans/${editingId}`, payload);
+  //     resetForm();
+  //     fetchPlans();
+  //   } catch (e) {
+  //     console.error(e);
+  //     setErr("Failed to save plan");
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
-  const onToggleEnabled = async (p) => {
-    setLoading(true);
-    setErr("");
-    try {
-      await axios.patch(`${API_BASE}/api/plans/${p._id}/enable`, {
-        enabled: !p.enabled,
-      });
-      await fetchPlans();
-    } catch (e) {
-      console.error(e);
-      setErr("Failed to toggle plan");
-    } finally {
-      setLoading(false);
-    }
-  };
+  // const onToggleEnabled = async (p) => {
+  //   setLoading(true);
+  //   setErr("");
+  //   try {
+  //     await axios.patch(`${API_BASE}/api/plans/${p._id}/enable`, {
+  //       enabled: !p.enabled,
+  //     });
+  //     await fetchPlans();
+  //   } catch (e) {
+  //     console.error(e);
+  //     setErr("Failed to toggle plan");
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   // const onEdit = (p) => {
   //   setEditingId(p._id);
@@ -316,14 +316,14 @@ const Plans = () => {
                       className={styles.editButton}
                       disabled={loading}
                     >
-                      <img src={Edit} />
+                      <img src={Edit} alt="Edit" />
                     </button>
                     <button
                       onClick={() => onDelete(p)}
                       className={styles.deleteButton}
                       disabled={loading}
                     >
-                      <img src={Delete} />
+                      <img src={Delete} alt="Delete" />
                     </button>
                   </div>
                 </td>

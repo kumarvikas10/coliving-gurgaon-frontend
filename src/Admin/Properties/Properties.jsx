@@ -1,5 +1,5 @@
 // src/admin/Properties/Properties.jsx
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import { ClipLoader } from "react-spinners";
 import styles from "../Cities/Cities.module.css";
@@ -356,7 +356,7 @@ export default function Properties({ goToAdd, goToEdit }) {
                       className={styles.editButton}
                       disabled={loading}
                     >
-                      <img src={Edit} />
+                      <img src={Edit} alt="Edit" />
                     </button>
                     <button
                       onClick={() => onToggleStatus(p)}
@@ -364,9 +364,9 @@ export default function Properties({ goToAdd, goToEdit }) {
                       disabled={loading}
                     >
                       {p.status === "approved" ? (
-                        <img src={Enable} />
+                        <img src={Enable} alt="Enable" />
                       ) : (
-                        <img src={Disable} />
+                        <img src={Disable} alt="Disable" />
                       )}
                     </button>
                     <button
@@ -374,7 +374,7 @@ export default function Properties({ goToAdd, goToEdit }) {
                       className={styles.deleteButton}
                       disabled={loading}
                     >
-                      <img src={Delete} />
+                      <img src={Delete} alt="Delete" />
                     </button>
                   </div>
                 </td>

@@ -15,8 +15,6 @@ const humanize = (slug) =>
 
 export default function MicroLocationPage() {
   const { citySlug, locationSlug } = useParams();
-  const locationName = humanize(locationSlug);
-
   const [locationData, setLocationData] = useState(null); // header/stat card
   const [properties, setProperties] = useState([]); // cards grid (sample until API)
   const [nearbyLocations, setNearbyLocations] = useState([]); // chips

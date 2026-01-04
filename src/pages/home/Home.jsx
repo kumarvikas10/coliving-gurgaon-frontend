@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import styles from "./Home.module.css";
 import location from "../../assets/Location.svg";
@@ -70,7 +70,6 @@ const Home = () => {
   const [properties, setProperties] = useState([]);
   const [loadingProps, setLoadingProps] = useState(false);
   const [errProps, setErrProps] = useState("");
-  const [searchLocation, setSearchLocation] = useState("");
   const [selectedLocation, setSelectedLocation] = useState("All");
 
   const [isLocationOpen, setIsLocationOpen] = useState(false);

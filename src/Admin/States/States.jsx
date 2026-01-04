@@ -194,14 +194,14 @@ export default function States() {
                       onClick={() => onEdit(r)}
                       disabled={loading}
                     >
-                      <img src={Edit} />
+                      <img src={Edit} alt="Edit" />
                     </button>
                     <button
                       className={styles.deleteButton}
                       onClick={() => onDelete(r)}
                       disabled={loading}
                     >
-                      <img src={Delete} />
+                      <img src={Delete} alt="Delete" />
                     </button>
                   </div>
                 </td>

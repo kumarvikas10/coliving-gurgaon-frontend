@@ -161,7 +161,7 @@ export default function Cities() {
                 <td>{c?.state?.displayState || c?.state?.state || "-"}</td>
                 <td>
                   <button onClick={() => handleEditClick(c)} className={styles.editButton} disabled={loading}>
-                    <img src={Edit} />
+                    <img src={Edit} alt="Edit" />
                   </button>
                   <button
                     onClick={() => handleDeleteCity(c.city)}
@@ -169,7 +169,7 @@ export default function Cities() {
                     disabled={loading}
                     style={{ marginLeft: 8 }}
                   >
-                    <img src={Delete} />
+                    <img src={Delete} alt="Delete" />
                   </button>
                 </td>
               </tr>
