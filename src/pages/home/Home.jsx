@@ -73,6 +73,9 @@ const Home = () => {
   const [searchLocation, setSearchLocation] = useState("");
   const [selectedLocation, setSelectedLocation] = useState("All");
 
+  const [isLocationOpen, setIsLocationOpen] = useState(false);
+  const [locationSearch, setLocationSearch] = useState("");
+
   const [cities, setCities] = useState([]);
   const [selectedCity, setSelectedCity] = useState("");
 
@@ -203,6 +206,74 @@ const Home = () => {
             <div className={styles.searchContainer}>
               <div className={styles.inputWrapper}>
                 <div className={styles.locationIcon}>
+                  <img src={location} alt="location" />
+                </div>
+                <span>Location</span>
+
+                {/* Dropdown input */}
+                <div className={styles.locationDropdown}>
+                  <input
+                    type="text"
+                    className={styles.searchInput}
+                    placeholder="Where do you want your co-living space?"
+                    value={locationSearch}
+                    onChange={(e) => {
+                      setLocationSearch(e.target.value);
+                      setIsLocationOpen(true);
+                    }}
+                    onFocus={() => setIsLocationOpen(true)}
+                    onBlur={() => {
+                      // Delay close to allow click on dropdown items
+                      setTimeout(() => setIsLocationOpen(false), 200);
+                    }}
+                    readOnly // Optional: prevents typing if you only want dropdown selection
+                  />
+
+                  {/* Dropdown list */}
+                  {isLocationOpen && microlocations.length > 0 && (
+                    <ul className={styles.dropdownList}>
+                      {microlocations
+                        .filter((ml) =>
+                          ml.name
+                            .toLowerCase()
+                            .includes(locationSearch.toLowerCase())
+                        )
+                        .map((ml) => (
+                          <li
+                            key={ml.slug}
+                            className={styles.dropdownItem}
+                            onClick={() => {
+                              setLocationSearch(ml.name);
+                              setIsLocationOpen(false);
+                              setSelectedLocation(ml.name);
+                              // Optional: navigate directly
+                              window.location.href = `/coliving/${selectedCity}/${ml.slug}`;
+                            }}
+                          >
+                            {ml.name}
+                          </li>
+                        ))}
+                    </ul>
+                  )}
+
+                  {!microlocations.length && isLocationOpen && (
+                    <div className={styles.dropdownEmpty}>
+                      No locations found
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <button type="submit" className={styles.searchButton}>
+                Search
+              </button>
+            </div>
+          </form>
+
+          {/* <form className={styles.searchForm} onSubmit={handleSearch}>
+            <div className={styles.searchContainer}>
+              <div className={styles.inputWrapper}>
+                <div className={styles.locationIcon}>
                   <img src={location} />
                 </div>
                 <span>Location</span>
@@ -218,7 +289,7 @@ const Home = () => {
                 Search
               </button>
             </div>
-          </form>
+          </form> */}
 
           {/* Property Images Grid */}
           <div className={styles.propertyGrid}>
