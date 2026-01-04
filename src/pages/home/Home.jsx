@@ -342,7 +342,7 @@ const Home = () => {
           {loadingProps && <p>Loading properties...</p>}
           {errProps && <p style={{ color: "red" }}>{errProps}</p>}
           <div className={styles.propertiesGrid}>
-            {properties.map((property) => (
+            {properties.slice(0, 12).map((property) => (
               <Link
                 key={property._id}
                 to={`/${selectedCity}/${property.slug}`}

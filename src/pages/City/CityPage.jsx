@@ -14,6 +14,8 @@ export default function CityPage() {
   const [microlocations, setMicrolocations] = useState([]);
   const [selectedLocation, setSelectedLocation] = useState("All");
   const [showFilters, setShowFilters] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const PROPERTIES_PER_PAGE = 24;
   const [cityContent, setCityContent] = useState({
     city: "",
     displayCity: "",
@@ -140,6 +142,20 @@ export default function CityPage() {
 
   const toggleFilters = () => setShowFilters((v) => !v);
 
+  const paginatedProperties = useMemo(() => {
+    const startIndex = (currentPage - 1) * PROPERTIES_PER_PAGE;
+    const endIndex = startIndex + PROPERTIES_PER_PAGE;
+    return properties.slice(startIndex, endIndex);
+  }, [properties, currentPage]);
+
+  const totalPages = useMemo(
+    () => Math.ceil(properties.length / PROPERTIES_PER_PAGE),
+    [properties.length]
+  );
+
+  const hasNextPage = currentPage < totalPages;
+  const hasPrevPage = currentPage > 1;
+
   if (loading) {
     return <div className={styles.loading}>Loading...</div>;
   }
@@ -153,7 +169,9 @@ export default function CityPage() {
               Home
             </Link>
             <span className={styles.breadcrumbSeparator}>/</span>
-            <span className={styles.breadcrumbCurrent}>{cityContent.displayCity || citySlug}</span>
+            <span className={styles.breadcrumbCurrent}>
+              {cityContent.displayCity || citySlug}
+            </span>
           </div>
         </div>
 
@@ -200,7 +218,7 @@ export default function CityPage() {
         <section className={styles.propertiesSection}>
           <div className={`container ${styles.container}`}>
             <div className={styles.propertiesGrid}>
-              {properties.map((property) => (
+              {paginatedProperties.map((property) => (
                 <Link
                   key={property._id}
                   to={`/${citySlug}/${property.slug}`}
@@ -257,9 +275,46 @@ export default function CityPage() {
               ))}
             </div>
 
-            <div className={styles.viewMoreContainer}>
-              <button className={styles.viewMoreBtn}>View More Spaces</button>
-            </div>
+            {totalPages > 1 && (
+              <div className={styles.paginationContainer}>
+                <button
+                  className={`${styles.paginationBtn} ${
+                    !hasPrevPage ? styles.disabled : ""
+                  }`}
+                  onClick={() => setCurrentPage((p) => p - 1)}
+                  disabled={!hasPrevPage}
+                >
+                  Previous
+                </button>
+
+                {/* Page numbers */}
+                <div className={styles.pageNumbers}>
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                    (page) => (
+                      <button
+                        key={page}
+                        className={`${styles.pageNum} ${
+                          page === currentPage ? styles.active : ""
+                        }`}
+                        onClick={() => setCurrentPage(page)}
+                      >
+                        {page}
+                      </button>
+                    )
+                  )}
+                </div>
+
+                <button
+                  className={`${styles.paginationBtn} ${
+                    !hasNextPage ? styles.disabled : ""
+                  }`}
+                  onClick={() => setCurrentPage((p) => p + 1)}
+                  disabled={!hasNextPage}
+                >
+                  Next
+                </button>
+              </div>
+            )}
           </div>
         </section>
       </div>
