@@ -42,7 +42,7 @@ const Footer = () => {
 
         {/* Main Heading */}
         <div className={styles.mainHeading}>
-          <h1>Coliving Space in Gurgaon</h1>
+          <h2>Coliving Space in Gurgaon</h2>
         </div>
 
         {/* Bottom Section */}
