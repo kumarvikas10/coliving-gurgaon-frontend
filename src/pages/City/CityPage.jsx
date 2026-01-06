@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo } from "react";
 import axios from "axios";
 import styles from "./CityPage.module.css";
 import rating from "../../assets/star.svg";
+import { Helmet } from "react-helmet";
 
 const API_BASE = process.env.REACT_APP_API_BASE;
 
@@ -160,8 +161,40 @@ export default function CityPage() {
     return <div className={styles.loading}>Loading...</div>;
   }
 
+  const title =
+    cityContent.metaTitle ||
+    `Coliving Spaces in ${cityContent.displayCity || citySlug}`;
+  const description =
+    cityContent.metaDescription ||
+    `Discover fully furnished coliving spaces in ${
+      cityContent.displayCity || citySlug
+    } with modern amenities and flexible stays.`;
+  const canonicalUrl = `${API_BASE}/coliving/${citySlug}`;
+
   return (
     <>
+      <Helmet>
+        <title>{title}</title>
+        <meta name="description" content={description} />
+
+        {/* Canonical for this city URL */}
+        <link rel="canonical" href={canonicalUrl} />
+
+        {/* Open Graph tags */}
+        <meta property="og:title" content={title} />
+        <meta property="og:description" content={description} />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={canonicalUrl} />
+        <meta
+          property="og:image"
+          content="https://colivinggurgaon.com/og.png"
+        />
+
+        {/* Optional: JSON-LD Schema.org from DB if present */}
+        {cityContent.schemaMarkup && (
+          <script type="application/ld+json">{cityContent.schemaMarkup}</script>
+        )}
+      </Helmet>
       <div className={styles.cityPage}>
         <div className={styles.breadcrumb}>
           <div className={`container ${styles.container}`}>

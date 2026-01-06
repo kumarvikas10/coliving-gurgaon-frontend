@@ -15,6 +15,7 @@ import Thumbnails from "yet-another-react-lightbox/plugins/thumbnails";
 import Zoom from "yet-another-react-lightbox/plugins/zoom";
 import Fullscreen from "yet-another-react-lightbox/plugins/fullscreen";
 import "yet-another-react-lightbox/plugins/thumbnails.css";
+import { Helmet } from "react-helmet";
 
 const API_BASE = process.env.REACT_APP_API_BASE;
 
@@ -161,171 +162,242 @@ const PropertyPage = () => {
           Number(n)
         );
 
+  const seoTitle =
+    property.seo?.title?.trim() ||
+    `${property.name} Coliving in ${
+      property.city?.displayCity || property.city?.city || citySlug
+    }`;
+
+  const seoDescription =
+    property.seo?.description?.trim() ||
+    `Fully furnished coliving at ${property.name} in ${
+      property.city?.displayCity || property.city?.city || citySlug
+    } with modern amenities, flexible plans, and hassle-free living.`;
+
+  const canonicalUrl = `${API_BASE}/${citySlug}/${property.slug}`;
+
+  // Open Graph (fallbacks to main image + SEO or generic)
+  const ogTitle = property.seo?.open_graph?.title?.trim() || seoTitle;
+
+  const ogDescription =
+    property.seo?.open_graph?.description?.trim() || seoDescription;
+
+  const ogImage =
+    property.seo?.open_graph?.image?.trim() ||
+    property.images?.[0]?.secureUrl ||
+    `${API_BASE}/og.png`;
+
+  // Twitter (summary_large_image card)
+  const twitterTitle = property.seo?.twitter?.title?.trim() || seoTitle;
+
+  const twitterDescription =
+    property.seo?.twitter?.description?.trim() || seoDescription;
+
+  const twitterImage = property.seo?.twitter?.image?.trim() || ogImage;
+
+  const robots = property.seo?.robots?.trim() || "index, follow";
+
+  const keywords =
+    Array.isArray(property.seo?.keywords) && property.seo.keywords.length
+      ? property.seo.keywords.join(", ")
+      : "";
+
   return (
-    <div className={styles.propertyPage}>
-      {/* Breadcrumb */}
-      <div className={styles.breadcrumb}>
-        <div className={`container ${styles.container}`}>
-          <Link to="/" className={styles.breadcrumbLink}>
-            Home
-          </Link>
-          <span className={styles.breadcrumbSeparator}>/</span>
-          <Link
-            to={`/coliving/${property.city?.slug || citySlug}`}
-            className={styles.breadcrumbLink}
-          >
-            {property.city?.displayCity || property.city?.city || citySlug}
-          </Link>
-          <span className={styles.breadcrumbSeparator}>/</span>
-          <span className={styles.breadcrumbCurrent}>{property.name}</span>
-        </div>
-      </div>
+    <>
+      <Helmet>
+        <title>{seoTitle}</title>
+        <meta name="description" content={seoDescription} />
+        <meta name="robots" content={robots} />
+        {keywords && <meta name="keywords" content={keywords} />}
 
-      {/* Property Header */}
-      <div className={styles.propertyHeader}>
-        <div className={`container ${styles.container}`}>
-          <div className={styles.propertyHead}>
-            <div>
-              <h1 className={styles.propertyTitle}>{property.name}</h1>
-              <p className={styles.propertyLocation}>
-                <span>
-                  <img src={rating} alt="rating" />
-                  {property.rating}
-                </span>
-                <span>|</span>
-                <span>
-                  <img src={location} alt="location" />
-                  {property.location.address}
-                </span>
-                <span>|</span>
-                <span>
-                  <img src={price} alt="price" />
-                  Best price guarantee
-                </span>
-              </p>
-            </div>
-            <div className={styles.priceSection}>
-              <p>
-                Starting from
-                <span>₹{property.startingPrice.toLocaleString()}/month</span>
-              </p>
-            </div>
+        {/* Canonical */}
+        <link rel="canonical" href={canonicalUrl} />
+
+        {/* Open Graph */}
+        <meta property="og:title" content={ogTitle} />
+        <meta property="og:description" content={ogDescription} />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={canonicalUrl} />
+        <meta property="og:image" content={ogImage} />
+        <meta property="og:site_name" content="Vista Urban Living" />
+
+        {/* Twitter Card */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={twitterTitle} />
+        <meta name="twitter:description" content={twitterDescription} />
+        <meta name="twitter:image" content={twitterImage} />
+      </Helmet>
+      <div className={styles.propertyPage}>
+        {/* Breadcrumb */}
+        <div className={styles.breadcrumb}>
+          <div className={`container ${styles.container}`}>
+            <Link to="/" className={styles.breadcrumbLink}>
+              Home
+            </Link>
+            <span className={styles.breadcrumbSeparator}>/</span>
+            <Link
+              to={`/coliving/${property.city?.slug || citySlug}`}
+              className={styles.breadcrumbLink}
+            >
+              {property.city?.displayCity || property.city?.city || citySlug}
+            </Link>
+            <span className={styles.breadcrumbSeparator}>/</span>
+            <span className={styles.breadcrumbCurrent}>{property.name}</span>
           </div>
         </div>
-      </div>
 
-      {/* Property Images with Lightbox */}
-      <div className={styles.propertyImages}>
-        <div className={`container ${styles.container}`}>
-          <div className={styles.imageGallery}>
-            {property.images?.length > 0 && (
-              <div
-                className={styles.largeImage}
-                onClick={() => openLightbox(0)}
-              >
-                {property.images && property.images.length > 0 && (
-                  <img src={property.images[0].secureUrl} alt={property.name} />
-                )}
-                <div className={styles.viewAllPhotos}>
-                  View all {property.images.length} photos
-                </div>
+        {/* Property Header */}
+        <div className={styles.propertyHeader}>
+          <div className={`container ${styles.container}`}>
+            <div className={styles.propertyHead}>
+              <div>
+                <h1 className={styles.propertyTitle}>{property.name}</h1>
+                <p className={styles.propertyLocation}>
+                  <span>
+                    <img src={rating} alt="rating" />
+                    {property.rating}
+                  </span>
+                  <span>|</span>
+                  <span>
+                    <img src={location} alt="location" />
+                    {property.location.address}
+                  </span>
+                  <span>|</span>
+                  <span>
+                    <img src={price} alt="price" />
+                    Best price guarantee
+                  </span>
+                </p>
               </div>
-            )}
-            <div className={styles.smallImages}>
-              {property.images?.slice(1, MAX_THUMBNAILS + 1).map((img, idx) => (
-                <div
-                  key={img.publicId}
-                  className={`${styles.smallImage} ${
-                    selectedImage === idx + 1 ? styles.active : ""
-                  }`}
-                  onClick={() => handleThumbnailClick(idx + 1)}
-                >
-                  <img
-                    src={img.secureUrl}
-                    alt={`${property.name} Image ${idx + 2}`}
-                  />
-                </div>
-              ))}
+              <div className={styles.priceSection}>
+                <p>
+                  Starting from
+                  <span>₹{property.startingPrice.toLocaleString()}/month</span>
+                </p>
+              </div>
             </div>
           </div>
-
-          {/* Lightbox Component - Shows ALL images */}
-          <Lightbox
-            open={lightboxOpen}
-            close={() => setLightboxOpen(false)}
-            index={lightboxIndex}
-            slides={(property.images || []).map((img, index) => ({
-              src: img.secureUrl,
-              alt: `${property.name} - Image ${index + 1}`,
-              width: 1200,
-              height: 800,
-            }))}
-            plugins={[Thumbnails, Zoom, Fullscreen]}
-            thumbnails={{
-              position: "bottom",
-              width: 120,
-              height: 80,
-              border: 0,
-              borderRadius: 8,
-              padding: 4,
-              gap: 8,
-            }}
-            zoom={{
-              maxZoomPixelRatio: 3,
-              zoomInMultiplier: 2,
-              doubleTapDelay: 300,
-              doubleClickDelay: 300,
-              doubleClickMaxStops: 2,
-              keyboardMoveDistance: 50,
-              wheelZoomDistanceFactor: 100,
-              pinchZoomDistanceFactor: 100,
-              scrollToZoom: true,
-            }}
-            carousel={{
-              finite: true,
-              preload: 2,
-              padding: "16px",
-              spacing: "30%",
-              imageFit: "contain",
-            }}
-            render={{
-              buttonPrev: property.images.length <= 1 ? () => null : undefined,
-              buttonNext: property.images.length <= 1 ? () => null : undefined,
-            }}
-            controller={{
-              closeOnBackdropClick: true,
-              closeOnPullDown: true,
-              closeOnPullUp: true,
-            }}
-          />
         </div>
-      </div>
-      <div className={styles.propertyContent}>
-        <div className={`container ${styles.container}`}>
-          <div className={styles.contentGrid}>
-            <div className={styles.leftContent}>
-              <section className={styles.propertyAbout}>
-                <div className={styles.propertyDescription}>
-                  <p className={styles.descriptionText}>
-                    {showFullDescription
-                      ? property.description
-                      : `${previewText}${isLong ? "..." : ""}`}
-                  </p>
 
-                  {isLong && (
-                    <button
-                      className={styles.showMoreBtn}
-                      aria-expanded={showFullDescription}
-                      onClick={() => setShowFullDescription((s) => !s)}
-                    >
-                      {showFullDescription ? "Show Less" : "Show More"}
-                    </button>
+        {/* Property Images with Lightbox */}
+        <div className={styles.propertyImages}>
+          <div className={`container ${styles.container}`}>
+            <div className={styles.imageGallery}>
+              {property.images?.length > 0 && (
+                <div
+                  className={styles.largeImage}
+                  onClick={() => openLightbox(0)}
+                >
+                  {property.images && property.images.length > 0 && (
+                    <img
+                      src={property.images[0].secureUrl}
+                      alt={property.name}
+                    />
                   )}
+                  <div className={styles.viewAllPhotos}>
+                    View all {property.images.length} photos
+                  </div>
                 </div>
-                <hr className={styles.headerline} />
-                <div className={styles.amenitiesSection}>
-                  <h2 className={styles.sectionTitle}>Amenities</h2>
-                  {/* <div className={styles.amenitiesGrid}>
+              )}
+              <div className={styles.smallImages}>
+                {property.images
+                  ?.slice(1, MAX_THUMBNAILS + 1)
+                  .map((img, idx) => (
+                    <div
+                      key={img.publicId}
+                      className={`${styles.smallImage} ${
+                        selectedImage === idx + 1 ? styles.active : ""
+                      }`}
+                      onClick={() => handleThumbnailClick(idx + 1)}
+                    >
+                      <img
+                        src={img.secureUrl}
+                        alt={`${property.name} Image ${idx + 2}`}
+                      />
+                    </div>
+                  ))}
+              </div>
+            </div>
+
+            {/* Lightbox Component - Shows ALL images */}
+            <Lightbox
+              open={lightboxOpen}
+              close={() => setLightboxOpen(false)}
+              index={lightboxIndex}
+              slides={(property.images || []).map((img, index) => ({
+                src: img.secureUrl,
+                alt: `${property.name} - Image ${index + 1}`,
+                width: 1200,
+                height: 800,
+              }))}
+              plugins={[Thumbnails, Zoom, Fullscreen]}
+              thumbnails={{
+                position: "bottom",
+                width: 120,
+                height: 80,
+                border: 0,
+                borderRadius: 8,
+                padding: 4,
+                gap: 8,
+              }}
+              zoom={{
+                maxZoomPixelRatio: 3,
+                zoomInMultiplier: 2,
+                doubleTapDelay: 300,
+                doubleClickDelay: 300,
+                doubleClickMaxStops: 2,
+                keyboardMoveDistance: 50,
+                wheelZoomDistanceFactor: 100,
+                pinchZoomDistanceFactor: 100,
+                scrollToZoom: true,
+              }}
+              carousel={{
+                finite: true,
+                preload: 2,
+                padding: "16px",
+                spacing: "30%",
+                imageFit: "contain",
+              }}
+              render={{
+                buttonPrev:
+                  property.images.length <= 1 ? () => null : undefined,
+                buttonNext:
+                  property.images.length <= 1 ? () => null : undefined,
+              }}
+              controller={{
+                closeOnBackdropClick: true,
+                closeOnPullDown: true,
+                closeOnPullUp: true,
+              }}
+            />
+          </div>
+        </div>
+        <div className={styles.propertyContent}>
+          <div className={`container ${styles.container}`}>
+            <div className={styles.contentGrid}>
+              <div className={styles.leftContent}>
+                <section className={styles.propertyAbout}>
+                  <div className={styles.propertyDescription}>
+                    <p className={styles.descriptionText}>
+                      {showFullDescription
+                        ? property.description
+                        : `${previewText}${isLong ? "..." : ""}`}
+                    </p>
+
+                    {isLong && (
+                      <button
+                        className={styles.showMoreBtn}
+                        aria-expanded={showFullDescription}
+                        onClick={() => setShowFullDescription((s) => !s)}
+                      >
+                        {showFullDescription ? "Show Less" : "Show More"}
+                      </button>
+                    )}
+                  </div>
+                  <hr className={styles.headerline} />
+                  <div className={styles.amenitiesSection}>
+                    <h2 className={styles.sectionTitle}>Amenities</h2>
+                    {/* <div className={styles.amenitiesGrid}>
                     {Array.isArray(property.amenities) &&
                       property.amenities.map((amenity, index) => (
                         <div key={index} className={styles.amenityItem}>
@@ -338,103 +410,141 @@ const PropertyPage = () => {
                         </div>
                       ))}
                   </div> */}
-                  <div className={styles.amenitiesGrid}>
-                    {propertyAmenitiesDetails
-                      .filter((amenity) => amenity && amenity._id)
-                      .map((amenity) => (
-                        <div key={amenity._id} className={styles.amenityItem}>
-                          {amenity.icon?.secureUrl ? (
-                            <img
-                              className={styles.amenityIcon}
-                              src={amenity.icon.secureUrl}
-                              alt={amenity.label}
-                            />
-                          ) : (
-                            <span className={styles.amenityIcon}>
-                              {amenity.icon}
-                            </span> // fallback if icon is string or emoji
-                          )}
-                          <span className={styles.amenityLabel}>
-                            {amenity.name}
-                          </span>
-                        </div>
-                      ))}
-                  </div>
-                </div>
-              </section>
-              <section className={styles.roomsSection}>
-                <div className={styles.container}>
-                  <div className={styles.roomsHeader}>
-                    <div>
-                      <h2 className={styles.sectionTitle}>Coliving Rooms</h2>
-                      <p className={styles.sectionSubtitle}>
-                        Fully furnished private room & sharing room with access
-                        to shared amenities
-                      </p>
-                    </div>
-                    <button
-                      type="button"
-                      className={styles.checkBtn}
-                      onClick={() =>
-                        document
-                          .getElementById("booking-form")
-                          ?.scrollIntoView({ behavior: "smooth" })
-                      }
-                      aria-label="Check availability"
-                    >
-                      Check availability
-                    </button>
-                  </div>
-
-                  <div className={styles.roomsList}>
-                    {Array.isArray(enrichedPlans) &&
-                      enrichedPlans.map((room, index) => (
-                        <article
-                          key={room._id || room.plan}
-                          className={styles.roomCard}
-                          role="group"
-                          aria-labelledby={`room-${room._id}-title`}
-                        >
-                          {/* Left: Image */}
-                          <div className={styles.roomImage}>
-                            {property.images &&
-                            property.images.length > index ? (
+                    <div className={styles.amenitiesGrid}>
+                      {propertyAmenitiesDetails
+                        .filter((amenity) => amenity && amenity._id)
+                        .map((amenity) => (
+                          <div key={amenity._id} className={styles.amenityItem}>
+                            {amenity.icon?.secureUrl ? (
                               <img
-                                src={property.images[index].secureUrl}
-                                alt={property.name}
+                                className={styles.amenityIcon}
+                                src={amenity.icon.secureUrl}
+                                alt={amenity.label}
                               />
                             ) : (
-                              <img src="/default-room.jpg" alt="Default Room" />
+                              <span className={styles.amenityIcon}>
+                                {amenity.icon}
+                              </span> // fallback if icon is string or emoji
                             )}
+                            <span className={styles.amenityLabel}>
+                              {amenity.name}
+                            </span>
                           </div>
+                        ))}
+                    </div>
+                  </div>
+                </section>
+                <section className={styles.roomsSection}>
+                  <div className={styles.container}>
+                    <div className={styles.roomsHeader}>
+                      <div>
+                        <h2 className={styles.sectionTitle}>Coliving Rooms</h2>
+                        <p className={styles.sectionSubtitle}>
+                          Fully furnished private room & sharing room with
+                          access to shared amenities
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        className={styles.checkBtn}
+                        onClick={() =>
+                          document
+                            .getElementById("booking-form")
+                            ?.scrollIntoView({ behavior: "smooth" })
+                        }
+                        aria-label="Check availability"
+                      >
+                        Check availability
+                      </button>
+                    </div>
 
-                          {/* Middle: Room info */}
-                          <div className={styles.roomInfo}>
-                            <div className={styles.roomHead}>
-                              <h3
-                                id={`room-${room.id}-title`}
-                                className={styles.roomType}
-                              >
-                                {room.type}
-                              </h3>
+                    <div className={styles.roomsList}>
+                      {Array.isArray(enrichedPlans) &&
+                        enrichedPlans.map((room, index) => (
+                          <article
+                            key={room._id || room.plan}
+                            className={styles.roomCard}
+                            role="group"
+                            aria-labelledby={`room-${room._id}-title`}
+                          >
+                            {/* Left: Image */}
+                            <div className={styles.roomImage}>
+                              {property.images &&
+                              property.images.length > index ? (
+                                <img
+                                  src={property.images[index].secureUrl}
+                                  alt={property.name}
+                                />
+                              ) : (
+                                <img
+                                  src="/default-room.jpg"
+                                  alt="Default Room"
+                                />
+                              )}
                             </div>
 
-                            <p className={styles.roomDescription}>
-                              {room.description}
-                            </p>
+                            {/* Middle: Room info */}
+                            <div className={styles.roomInfo}>
+                              <div className={styles.roomHead}>
+                                <h3
+                                  id={`room-${room.id}-title`}
+                                  className={styles.roomType}
+                                >
+                                  {room.type}
+                                </h3>
+                              </div>
 
-                            {/* Feature chips */}
-                            <div className={styles.featureChips}>
-                              {Array.isArray(room.features) &&
-                                room.features.map((feat, i) => (
-                                  <span key={i} className={styles.chip}>
-                                    {feat}
+                              <p className={styles.roomDescription}>
+                                {room.description}
+                              </p>
+
+                              {/* Feature chips */}
+                              <div className={styles.featureChips}>
+                                {Array.isArray(room.features) &&
+                                  room.features.map((feat, i) => (
+                                    <span key={i} className={styles.chip}>
+                                      {feat}
+                                    </span>
+                                  ))}
+                              </div>
+
+                              {/* CTA (mobile-first position) */}
+                              <div className={styles.mobileCta}>
+                                <button
+                                  type="button"
+                                  className={styles.enquireBtn}
+                                  onClick={() =>
+                                    document
+                                      .getElementById("booking-form")
+                                      ?.scrollIntoView({ behavior: "smooth" })
+                                  }
+                                >
+                                  Enquire Now
+                                </button>
+                              </div>
+                            </div>
+
+                            {/* Right: Price */}
+                            <div className={styles.roomPriceWrap}>
+                              <span className={styles.priceLabel}>
+                                Starting Price
+                              </span>
+                              <div className={styles.priceRow}>
+                                <span className={styles.priceSymbol}>₹</span>
+                                <span className={styles.priceValue}>
+                                  {formatINR(room.price)}
+                                </span>
+                                <span className={styles.priceUnit}>
+                                  / month
+                                </span>
+                              </div>
+                              {room.originalPrice && (
+                                <div className={styles.strikeRow}>
+                                  <span className={styles.strike}>
+                                    ₹{formatINR(room.originalPrice)}
                                   </span>
-                                ))}
-                            </div>
-
-                            {/* CTA (mobile-first position) */}
-                            <div className={styles.mobileCta}>
+                                </div>
+                              )}
                               <button
                                 type="button"
                                 className={styles.enquireBtn}
@@ -447,66 +557,34 @@ const PropertyPage = () => {
                                 Enquire Now
                               </button>
                             </div>
-                          </div>
-
-                          {/* Right: Price */}
-                          <div className={styles.roomPriceWrap}>
-                            <span className={styles.priceLabel}>
-                              Starting Price
-                            </span>
-                            <div className={styles.priceRow}>
-                              <span className={styles.priceSymbol}>₹</span>
-                              <span className={styles.priceValue}>
-                                {formatINR(room.price)}
-                              </span>
-                              <span className={styles.priceUnit}>/ month</span>
-                            </div>
-                            {room.originalPrice && (
-                              <div className={styles.strikeRow}>
-                                <span className={styles.strike}>
-                                  ₹{formatINR(room.originalPrice)}
-                                </span>
-                              </div>
-                            )}
-                            <button
-                              type="button"
-                              className={styles.enquireBtn}
-                              onClick={() =>
-                                document
-                                  .getElementById("booking-form")
-                                  ?.scrollIntoView({ behavior: "smooth" })
-                              }
-                            >
-                              Enquire Now
-                            </button>
-                          </div>
-                        </article>
-                      ))}
-                  </div>
-                </div>
-              </section>
-              <section className={styles.locationSection}>
-                <div className={styles.container}>
-                  <div className={styles.roomsHeader}>
-                    <div>
-                      <h2 className={styles.sectionTitle}>Location</h2>
-                      <p className={styles.sectionSubtitle}>
-                        Stay connected to everything you need with a central
-                        location
-                      </p>
+                          </article>
+                        ))}
                     </div>
                   </div>
-                  <LocationSection property={property} />
-                </div>
-              </section>
-            </div>
-            <div className={styles.rightContent}>
-              <BookingForm property={property} roomTypes={enrichedPlans} />
+                </section>
+                <section className={styles.locationSection}>
+                  <div className={styles.container}>
+                    <div className={styles.roomsHeader}>
+                      <div>
+                        <h2 className={styles.sectionTitle}>Location</h2>
+                        <p className={styles.sectionSubtitle}>
+                          Stay connected to everything you need with a central
+                          location
+                        </p>
+                      </div>
+                    </div>
+                    <LocationSection property={property} />
+                  </div>
+                </section>
+              </div>
+              <div className={styles.rightContent}>
+                <BookingForm property={property} roomTypes={enrichedPlans} />
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

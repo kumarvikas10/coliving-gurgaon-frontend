@@ -24,6 +24,7 @@ import userAvatar5 from "../../assets/ananya.png";
 import userAvatar6 from "../../assets/ananya.png";
 import reviewImage1 from "../../assets/review-image-1.png";
 import reviewImage2 from "../../assets/review-image-2.png";
+import { Helmet } from "react-helmet";
 
 const API_BASE = process.env.REACT_APP_API_BASE;
 
@@ -184,6 +185,30 @@ const Home = () => {
 
   return (
     <>
+      <Helmet>
+        <title>Best Coliving Spaces in Gurgaon Near Offices & Metro</title>
+        <meta
+          name="description"
+          content="Looking for safe and affordable coliving spaces in Gurgaon? Choose from verified properties with modern amenities, flexible rent, and hassle-free living."
+        />
+        <link rel="canonical" href="https://colivinggurgaon.com/" />
+
+        <meta
+          property="og:title"
+          content="Best Coliving Spaces in Gurgaon Near Offices & Metro"
+        />
+        <meta
+          property="og:description"
+          content="Looking for safe and affordable coliving spaces in Gurgaon? Choose from verified properties with modern amenities, flexible rent, and hassle-free living."
+        />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://colivinggurgaon.com/" />
+        <meta
+          property="og:image"
+          content="https://colivinggurgaon.com/og.png"
+        />
+      </Helmet>
+
       <section className={styles.hero}>
         <div className={`container ${styles.container}`}>
           {/* Main Heading */}
@@ -268,27 +293,6 @@ const Home = () => {
               </button>
             </div>
           </form>
-
-          {/* <form className={styles.searchForm} onSubmit={handleSearch}>
-            <div className={styles.searchContainer}>
-              <div className={styles.inputWrapper}>
-                <div className={styles.locationIcon}>
-                  <img src={location} />
-                </div>
-                <span>Location</span>
-                <input
-                  type="text"
-                  className={styles.searchInput}
-                  placeholder="Where do you want your co-living space?"
-                  value={searchLocation}
-                  onChange={(e) => setSearchLocation(e.target.value)}
-                />
-              </div>
-              <button type="submit" className={styles.searchButton}>
-                Search
-              </button>
-            </div>
-          </form> */}
 
           {/* Property Images Grid */}
           <div className={styles.propertyGrid}>
