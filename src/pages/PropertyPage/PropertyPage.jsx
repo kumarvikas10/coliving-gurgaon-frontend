@@ -18,6 +18,7 @@ import "yet-another-react-lightbox/plugins/thumbnails.css";
 import { Helmet } from "react-helmet";
 
 const API_BASE = process.env.REACT_APP_API_BASE;
+const URL_BASE = process.env.REACT_APP_FRONTEND_BASE;
 
 const PropertyPage = () => {
   const { citySlug, propertySlug } = useParams();
@@ -174,7 +175,7 @@ const PropertyPage = () => {
       property.city?.displayCity || property.city?.city || citySlug
     } with modern amenities, flexible plans, and hassle-free living.`;
 
-  const canonicalUrl = `${API_BASE}/${citySlug}/${property.slug}`;
+  const canonicalUrl = `${URL_BASE}/${citySlug}/${property.slug}`;
 
   // Open Graph (fallbacks to main image + SEO or generic)
   const ogTitle = property.seo?.open_graph?.title?.trim() || seoTitle;
@@ -185,7 +186,7 @@ const PropertyPage = () => {
   const ogImage =
     property.seo?.open_graph?.image?.trim() ||
     property.images?.[0]?.secureUrl ||
-    `${API_BASE}/og.png`;
+    `${URL_BASE}/og.png`;
 
   // Twitter (summary_large_image card)
   const twitterTitle = property.seo?.twitter?.title?.trim() || seoTitle;

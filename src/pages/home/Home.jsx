@@ -27,6 +27,7 @@ import reviewImage2 from "../../assets/review-image-2.png";
 import { Helmet } from "react-helmet";
 
 const API_BASE = process.env.REACT_APP_API_BASE;
+const URL_BASE = process.env.REACT_APP_FRONTEND_BASE;
 
 const FAQItem = ({ question, answer, defaultOpen = false }) => {
   const [isOpen, setIsOpen] = useState(defaultOpen);
@@ -102,10 +103,6 @@ const Home = () => {
         }));
         setCities(normalized);
 
-        // pick default city:
-        // 1) isDefault from backend (if you add that),
-        // 2) otherwise first city whose apiCity is "gurgaon" or "gurugram",
-        // 3) otherwise just first city.
         let defaultCity =
           normalized.find((c) => c.isDefault) ||
           normalized.find(

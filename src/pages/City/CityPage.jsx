@@ -7,6 +7,7 @@ import rating from "../../assets/star.svg";
 import { Helmet } from "react-helmet";
 
 const API_BASE = process.env.REACT_APP_API_BASE;
+const URL_BASE = process.env.REACT_APP_FRONTEND_BASE;
 
 export default function CityPage() {
   const { citySlug } = useParams();
@@ -169,7 +170,7 @@ export default function CityPage() {
     `Discover fully furnished coliving spaces in ${
       cityContent.displayCity || citySlug
     } with modern amenities and flexible stays.`;
-  const canonicalUrl = `${API_BASE}/coliving/${citySlug}`;
+  const canonicalUrl = `${URL_BASE}/coliving/${citySlug}`;
 
   return (
     <>

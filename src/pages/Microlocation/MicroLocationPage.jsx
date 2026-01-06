@@ -7,6 +7,7 @@ import rating from "../../assets/star.svg";
 import { Helmet } from "react-helmet";
 
 const API_BASE = process.env.REACT_APP_API_BASE;
+const URL_BASE = process.env.REACT_APP_FRONTEND_BASE;
 
 const humanize = (slug) =>
   (slug || "")
@@ -183,7 +184,7 @@ export default function MicroLocationPage() {
       microContent.displayCity || locationData.city
     } with modern amenities and flexible stays.`;
 
-  const canonicalUrl = `${API_BASE}/coliving/${citySlug}/${locationSlug}`;
+  const canonicalUrl = `${URL_BASE}/coliving/${citySlug}/${locationSlug}`;
 
   return (
     <>
