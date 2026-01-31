@@ -18,7 +18,7 @@ const Footer = () => {
             <h3 className={styles.sectionTitle}>Contact</h3>
             <div className={styles.contactInfo}>
               <p className={styles.phone}>
-                <a href="tel:+918527613659">+91-8527613659</a>
+                <a href="tel:+918527613659">+91-7827063300</a>
               </p>
               <p className={styles.email}>
                 <a href="mailto:Hello@colivingspacegurgaon.com">
@@ -32,9 +32,9 @@ const Footer = () => {
             <h3 className={styles.sectionTitle}>India</h3>
             <div className={styles.addressInfo}>
               <p>
-                Mangum Tower-1, 8th Floor, Golf Course Ext Rd, Sector 58,
+                Tower-B, UNITECH CYBER PARK, Sector 39,
                 <br />
-                Gurugram, Haryana 122011
+                Gurugram, Haryana 122003
               </p>
             </div>
           </div>
