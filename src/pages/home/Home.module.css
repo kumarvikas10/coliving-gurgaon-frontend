@@ -278,6 +278,7 @@
   font-weight: 600;
   color: var(--primary-black);
   margin-bottom: 12px;
+  text-transform: capitalize;
 }
 
 .spacesTitle p {
