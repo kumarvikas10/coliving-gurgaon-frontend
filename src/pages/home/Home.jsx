@@ -213,7 +213,7 @@ const Home = () => {
             <h1 className={styles.mainTitle}>
               Coliving Space in{" "}
               <span className={styles.locationHighlight}>
-                {displaySelectedCity || "Gurugram"}
+                {displaySelectedCity || Gurgaon}
               </span>
             </h1>
             <p className={styles.subtitle}>
