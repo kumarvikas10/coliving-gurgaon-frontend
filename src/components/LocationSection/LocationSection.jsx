@@ -44,7 +44,7 @@ const LocationSection = ({ property }) => {
   const { location } = property;
 
   return (
-    <section className={styles.locationSection}>
+    <section className={styles.locationSectionDiv}>
       <div className={styles.container}>
         <div className={styles.locationContent}>
           <div className={styles.mapContainer}>

@@ -368,7 +368,7 @@
   }
 
   .locationFilters {
-    justify-content: center;
+    justify-content: start;
   }
 }
 
@@ -379,7 +379,10 @@
 
   .propertiesGrid {
     grid-template-columns: 1fr;
-    max-width: 300px;
+  }
+
+   .propertyImage{
+    height: 200px;
   }
 
   .viewMoreBtn {

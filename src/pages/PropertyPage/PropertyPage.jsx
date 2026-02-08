@@ -54,7 +54,7 @@ const PropertyPage = () => {
       setLoading(true);
       try {
         const res = await axios.get(
-          `${API_BASE}/api/properties/slug/${propertySlug}`
+          `${API_BASE}/api/properties/slug/${propertySlug}`,
         );
         setProperty(res.data?.data || null);
       } catch (err) {
@@ -160,7 +160,7 @@ const PropertyPage = () => {
     n == null
       ? ""
       : new Intl.NumberFormat("en-IN", { maximumFractionDigits: 0 }).format(
-          Number(n)
+          Number(n),
         );
 
   const seoTitle =
@@ -266,11 +266,11 @@ const PropertyPage = () => {
                   <span>|</span>
                   <span>
                     <img src={price} alt="price" />
-                    Best price guarantee
+                    Best price <div className="deskHide">guarantee</div>
                   </span>
                 </p>
               </div>
-              <div className={styles.priceSection}>
+              <div className={`deskHide ${styles.priceSection}`}>
                 <p>
                   Starting from
                   <span>₹{property.startingPrice.toLocaleString()}/month</span>
@@ -279,8 +279,6 @@ const PropertyPage = () => {
             </div>
           </div>
         </div>
-
-        {/* Property Images with Lightbox */}
         <div className={styles.propertyImages}>
           <div className={`container ${styles.container}`}>
             <div className={styles.imageGallery}>
@@ -398,19 +396,6 @@ const PropertyPage = () => {
                   <hr className={styles.headerline} />
                   <div className={styles.amenitiesSection}>
                     <h2 className={styles.sectionTitle}>Amenities</h2>
-                    {/* <div className={styles.amenitiesGrid}>
-                    {Array.isArray(property.amenities) &&
-                      property.amenities.map((amenity, index) => (
-                        <div key={index} className={styles.amenityItem}>
-                          <span className={styles.amenityIcon}>
-                            {amenity.icon}
-                          </span>
-                          <span className={styles.amenityLabel}>
-                            {amenity.label}
-                          </span>
-                        </div>
-                      ))}
-                  </div> */}
                     <div className={styles.amenitiesGrid}>
                       {propertyAmenitiesDetails
                         .filter((amenity) => amenity && amenity._id)
@@ -447,7 +432,7 @@ const PropertyPage = () => {
                       </div>
                       <button
                         type="button"
-                        className={styles.checkBtn}
+                        className={`deskHide ${styles.checkBtn}`}
                         onClick={() =>
                           document
                             .getElementById("booking-form")
@@ -485,32 +470,68 @@ const PropertyPage = () => {
                             </div>
 
                             {/* Middle: Room info */}
-                            <div className={styles.roomInfo}>
-                              <div className={styles.roomHead}>
-                                <h3
-                                  id={`room-${room.id}-title`}
-                                  className={styles.roomType}
-                                >
-                                  {room.type}
-                                </h3>
+                            <div className={styles.roomDiv}>
+                              <div className={styles.roomInfo}>
+                                <div className={styles.roomHead}>
+                                  <h3
+                                    id={`room-${room.id}-title`}
+                                    className={styles.roomType}
+                                  >
+                                    {room.type}
+                                  </h3>
+                                </div>
+
+                                <p className={`deskHide ${styles.roomDescription}`}>
+                                  {room.description}
+                                </p>
+
+                                {/* Feature chips */}
+                                <div className={styles.featureChips}>
+                                  {Array.isArray(room.features) &&
+                                    room.features.map((feat, i) => (
+                                      <span key={i} className={styles.chip}>
+                                        {feat}
+                                      </span>
+                                    ))}
+                                </div>
+
+                                {/* CTA (mobile-first position) */}
+                                <div className={styles.mobileCta}>
+                                  <button
+                                    type="button"
+                                    className={styles.enquireBtn}
+                                    onClick={() =>
+                                      document
+                                        .getElementById("booking-form")
+                                        ?.scrollIntoView({ behavior: "smooth" })
+                                    }
+                                  >
+                                    Enquire Now
+                                  </button>
+                                </div>
                               </div>
 
-                              <p className={styles.roomDescription}>
-                                {room.description}
-                              </p>
-
-                              {/* Feature chips */}
-                              <div className={styles.featureChips}>
-                                {Array.isArray(room.features) &&
-                                  room.features.map((feat, i) => (
-                                    <span key={i} className={styles.chip}>
-                                      {feat}
+                              {/* Right: Price */}
+                              <div className={styles.roomPriceWrap}>
+                                <span className={styles.priceLabel}>
+                                  Starting Price
+                                </span>
+                                <div className={styles.priceRow}>
+                                  <span className={styles.priceSymbol}>₹</span>
+                                  <span className={styles.priceValue}>
+                                    {formatINR(room.price)}
+                                  </span>
+                                  <span className={styles.priceUnit}>
+                                    / month
+                                  </span>
+                                </div>
+                                {room.originalPrice && (
+                                  <div className={styles.strikeRow}>
+                                    <span className={styles.strike}>
+                                      ₹{formatINR(room.originalPrice)}
                                     </span>
-                                  ))}
-                              </div>
-
-                              {/* CTA (mobile-first position) */}
-                              <div className={styles.mobileCta}>
+                                  </div>
+                                )}
                                 <button
                                   type="button"
                                   className={styles.enquireBtn}
@@ -523,40 +544,6 @@ const PropertyPage = () => {
                                   Enquire Now
                                 </button>
                               </div>
-                            </div>
-
-                            {/* Right: Price */}
-                            <div className={styles.roomPriceWrap}>
-                              <span className={styles.priceLabel}>
-                                Starting Price
-                              </span>
-                              <div className={styles.priceRow}>
-                                <span className={styles.priceSymbol}>₹</span>
-                                <span className={styles.priceValue}>
-                                  {formatINR(room.price)}
-                                </span>
-                                <span className={styles.priceUnit}>
-                                  / month
-                                </span>
-                              </div>
-                              {room.originalPrice && (
-                                <div className={styles.strikeRow}>
-                                  <span className={styles.strike}>
-                                    ₹{formatINR(room.originalPrice)}
-                                  </span>
-                                </div>
-                              )}
-                              <button
-                                type="button"
-                                className={styles.enquireBtn}
-                                onClick={() =>
-                                  document
-                                    .getElementById("booking-form")
-                                    ?.scrollIntoView({ behavior: "smooth" })
-                                }
-                              >
-                                Enquire Now
-                              </button>
                             </div>
                           </article>
                         ))}
@@ -578,7 +565,7 @@ const PropertyPage = () => {
                   </div>
                 </section>
               </div>
-              <div className={styles.rightContent}>
+              <div className={`deskHide ${styles.rightContent}`}>
                 <BookingForm property={property} roomTypes={enrichedPlans} />
               </div>
             </div>

@@ -6,6 +6,7 @@
   padding: 0;
   box-sizing: border-box;
   --primary-color: #6376E8;
+  --hover-color: #5A6BCE;
   --primary-black: #161616;
   --secondary-black: #868585;
   --background-color: #EDEFFF;
@@ -80,6 +81,10 @@ h6 {
   color: white;
 }
 
+.deskHide {
+  display: inline-block;
+}
+
 /* Medium devices (tablets, landscape phones) */
 @media (max-width: 1024px) {
   .container {
@@ -95,5 +100,9 @@ h6 {
     max-width: 100%;
     padding-left: 12px;
     padding-right: 12px;
+  }
+
+  .deskHide {
+    display: none !important;
   }
 }

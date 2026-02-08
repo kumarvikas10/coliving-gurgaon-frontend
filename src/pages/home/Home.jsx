@@ -25,6 +25,7 @@ import userAvatar6 from "../../assets/ananya.png";
 import reviewImage1 from "../../assets/review-image-1.png";
 import reviewImage2 from "../../assets/review-image-2.png";
 import { Helmet } from "react-helmet";
+import SearchImg from '../../assets/search.svg'
 
 const API_BASE = process.env.REACT_APP_API_BASE;
 const URL_BASE = process.env.REACT_APP_FRONTEND_BASE;
@@ -106,7 +107,7 @@ const Home = () => {
         let defaultCity =
           normalized.find((c) => c.isDefault) ||
           normalized.find(
-            (c) => c.apiCity === "gurgaon" || c.apiCity === "gurugram"
+            (c) => c.apiCity === "gurgaon" || c.apiCity === "gurugram",
           ) ||
           normalized[0];
 
@@ -119,7 +120,7 @@ const Home = () => {
 
         const propsRes = await axios.get(
           `${API_BASE}/api/properties?city=${defaultCity._id}&status=approved`,
-          { signal: controller.signal }
+          { signal: controller.signal },
         );
         setProperties(propsRes.data?.data || []);
       } catch (err) {
@@ -144,7 +145,7 @@ const Home = () => {
         if (!cityObj) return;
         const res = await axios.get(
           `${API_BASE}/api/microlocations/${cityObj.apiCity}`,
-          { signal: controller.signal }
+          { signal: controller.signal },
         );
         const raw = Array.isArray(res.data) ? res.data : res.data?.data || [];
         const normalized = raw
@@ -174,8 +175,27 @@ const Home = () => {
   }, [selectedCity, cities]);
 
   const handleSearch = (e) => {
-    e.preventDefault();
-  };
+  e.preventDefault(); // ✅ REQUIRED
+  
+  console.log('🔍 SEARCH:', { 
+    selectedLocation, 
+    selectedCity, 
+    microlocations: microlocations.length 
+  });
+  
+  // ✅ NAVIGATE TO PAGE
+  if (selectedLocation && selectedCity) {
+    const selectedLoc = microlocations.find(ml => ml.name === selectedLocation);
+    if (selectedLoc?.slug) {
+      window.location.href = `/coliving/${selectedCity}/${selectedLoc.slug}`;
+    } else {
+      console.error('❌ Location slug not found');
+    }
+  } else {
+    console.error('❌ Missing location or city');
+  }
+};
+
 
   const selectedCityObj = cities.find((c) => c.routeSlug === selectedCity);
   const displaySelectedCity = selectedCityObj?.display || selectedCity;
@@ -211,10 +231,10 @@ const Home = () => {
           {/* Main Heading */}
           <div className={styles.titleSection}>
             <h1 className={styles.mainTitle}>
-              Coliving Space in{" "}
-              <span className={styles.locationHighlight}>
+              Coliving Space in <span className={styles.locationHighlight}>Gurgaon</span>
+              {/* <span className={styles.locationHighlight}>
                 {displaySelectedCity || "Gurgaon"}
-              </span>
+              </span> */}
             </h1>
             <p className={styles.subtitle}>
               Find your perfect coliving home with fully furnished private or
@@ -225,68 +245,83 @@ const Home = () => {
           {/* Search Section */}
           <form className={styles.searchForm} onSubmit={handleSearch}>
             <div className={styles.searchContainer}>
-              <div className={styles.inputWrapper}>
-                <div className={styles.locationIcon}>
-                  <img src={location} alt="location" />
-                </div>
-                <span>Location</span>
-
-                {/* Dropdown input */}
-                <div className={styles.locationDropdown}>
+              <div className={styles.searchGroup}>
+                <div className={styles.locationInputWrapper}>
+                  <div className={styles.locationIcon}>
+                    <img src={location} alt="location pin" />
+                  </div>
                   <input
                     type="text"
-                    className={styles.searchInput}
-                    placeholder="Where do you want your co-living space?"
+                    className={`${styles.searchInput} ${
+                      selectedLocation && styles.selectedLocation
+                    }`}
+                    placeholder="Search locations in Gurgaon"
                     value={locationSearch}
                     onChange={(e) => {
                       setLocationSearch(e.target.value);
                       setIsLocationOpen(true);
+                      // Clear selected location when typing
+                      if (selectedLocation) setSelectedLocation("");
                     }}
                     onFocus={() => setIsLocationOpen(true)}
-                    onBlur={() => {
-                      // Delay close to allow click on dropdown items
-                      setTimeout(() => setIsLocationOpen(false), 200);
+                    onBlur={(e) => {
+                      if (!e.currentTarget.contains(e.relatedTarget)) {
+                        setTimeout(() => setIsLocationOpen(false), 150);
+                      }
                     }}
-                    readOnly // Optional: prevents typing if you only want dropdown selection
                   />
+                </div>
 
-                  {/* Dropdown list */}
-                  {isLocationOpen && microlocations.length > 0 && (
-                    <ul className={styles.dropdownList}>
-                      {microlocations
-                        .filter((ml) =>
-                          ml.name
-                            .toLowerCase()
-                            .includes(locationSearch.toLowerCase())
-                        )
-                        .map((ml) => (
-                          <li
-                            key={ml.slug}
-                            className={styles.dropdownItem}
-                            onClick={() => {
-                              setLocationSearch(ml.name);
-                              setIsLocationOpen(false);
-                              setSelectedLocation(ml.name);
-                              // Optional: navigate directly
-                              window.location.href = `/coliving/${selectedCity}/${ml.slug}`;
-                            }}
-                          >
-                            {ml.name}
-                          </li>
-                        ))}
-                    </ul>
-                  )}
+                {/* Dropdown */}
+                {isLocationOpen && microlocations.length > 0 && (
+                  <ul className={styles.dropdownList} role="listbox">
+                    {microlocations
+                      .filter((ml) =>
+                        ml.name
+                          .toLowerCase()
+                          .includes(locationSearch.toLowerCase()),
+                      )
+                      .slice(0, 8)
+                      .map((ml, index) => (
+                        <li
+                          key={ml.slug}
+                          className={`${styles.dropdownItem} ${
+                            locationSearch === ml.name ? styles.highlighted : ""
+                          }`}
+                          role="option"
+                          onMouseDown={() => {
+                            setLocationSearch(ml.name);
+                            setSelectedLocation(ml.name);
+                            setIsLocationOpen(false);
+                            // ✅ NO navigation here - wait for Search button
+                          }}
+                        >
+                          <span>{ml.name}</span>
+                          <small className={styles.locationMeta}>
+                            {displaySelectedCity}
+                          </small>
+                        </li>
+                      ))}
+                  </ul>
+                )}
 
-                  {!microlocations.length && isLocationOpen && (
+                {isLocationOpen &&
+                  microlocations.length === 0 &&
+                  locationSearch && (
                     <div className={styles.dropdownEmpty}>
-                      No locations found
+                      No locations found for "{locationSearch}"
                     </div>
                   )}
-                </div>
               </div>
 
-              <button type="submit" className={styles.searchButton}>
-                Search
+              <button
+                type="submit"
+                className={`${styles.searchButton} ${
+                  selectedLocation ? styles.searchReady : ""
+                }`}
+                disabled={!selectedLocation}
+              >
+                <img src={SearchImg} alt="seachIcon" />
               </button>
             </div>
           </form>
@@ -376,7 +411,7 @@ const Home = () => {
               </p>
             </div>
 
-            <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+            <div className={`deskHide ${styles.spacesSectionButton}`}>
               <Link
                 to={`/coliving/${selectedCity}`}
                 className={styles.exploreBtn}

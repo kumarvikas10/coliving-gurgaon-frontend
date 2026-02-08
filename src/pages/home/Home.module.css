@@ -29,147 +29,244 @@
   line-height: 1.6;
 }
 
-/* Search Form */
 .searchForm {
-  margin-bottom: 60px;
-  display: flex;
-  justify-content: center;
+  margin-bottom: 48px;
+  width: 100%;
 }
 
 .searchContainer {
-  background: #F8F9FF;
-  border-radius: 12px;
-  padding: 8px;
   display: flex;
-  align-items: center;
+  gap: 16px;
   max-width: 600px;
+  margin: 0 auto;
   width: 100%;
-  border: 1px solid rgba(22, 22, 22, 0.1);
-  /* box-shadow: 0 2px 20px rgba(107, 122, 237, 0.1); */
 }
 
-.inputWrapper {
-  flex: 1;
+.searchGroup {
+  position: relative;
+  width: 100%;
+}
+
+.selectedLocation {
+  border-color: var(--primary-color) !important;
+}
+
+.selectedBadge {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: var(--primary-color);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 500;
   display: flex;
   align-items: center;
-  padding: 12px 16px;
+  gap: 4px;
+  z-index: 10;
+}
+
+.clearBtn {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 18px;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dropdownItem.highlighted {
+  background: #EEF2FF;
+  border-left-color: var(--primary-color);
+}
+
+
+.locationInputWrapper {
   position: relative;
+  background: #F8F9FF;
+  border-radius: 12px;
+  border: 2px solid transparent;
+  transition: all 0.2s ease;
+}
+
+.searchContainer:focus-within .locationInputWrapper {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(107, 122, 237, 0.1);
 }
 
 .locationIcon {
-  margin-right: 12px;
-  display: flex;
-  align-items: center;
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
+  pointer-events: none;
 }
 
 .locationIcon img {
-  height: 24px;
-}
-
-.inputWrapper span {
-  font-size: 1rem;
-  color: var(--primary-color);
-  font-weight: 500;
-  margin-right: 16px;
-  white-space: nowrap;
+  height: 20px;
+  opacity: 0.7;
 }
 
 .searchInput {
+  width: 100%;
+  padding: 18px 16px 18px 52px;
+  /* space for icon */
   border: none;
-  background: transparent;
-  font-size: 1rem;
+  border-radius: 12px;
+  background: #F8F9FF;
+  font-size: 16px;
+  /* Prevent iOS zoom */
   color: var(--primary-black);
-  flex: 1;
   outline: none;
+  transition: all 0.2s ease;
+}
+
+.searchInput:focus {
+  background: white;
+  box-shadow: 0 4px 12px rgba(107, 122, 237, 0.15);
 }
 
 .searchInput::placeholder {
-  color: var(--secondary-black);
+  color: #9CA3AF;
 }
 
-.searchButton {
-  background: var(--primary-color);
-  color: white;
-  border: none;
-  padding: 14px 32px;
-  border-radius: 8px;
-  font-size: 1rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
+.searchInput:valid {
+  background: white;
 }
 
-.searchButton:hover {
-  background: #5A6BCE;
-}
-
-.locationDropdown {
-  position: relative;
-  width: 100%;
-}
-
+/* ✅ PERFECT DROPDOWN */
 .dropdownList {
   position: absolute;
   top: 100%;
   left: 0;
   right: 0;
   background: white;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  max-height: 200px;
+  border: 1px solid #E5E7EB;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+  max-height: 320px;
   overflow-y: auto;
-  z-index: 1000;
+  z-index: 10000;
+  /* ✅ FIXED: High z-index */
   list-style: none;
-  padding: 0;
-  margin: 0;
+  padding: 8px 0;
+  margin: 4px 0 0 0;
+  backdrop-filter: blur(10px);
 }
 
 .dropdownItem {
-  padding: 12px 16px;
+  padding: 16px 20px;
   cursor: pointer;
-  border-bottom: 1px solid #f0f0f0;
-  transition: background-color 0.2s;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 16px;
+  color: var(--primary-black);
+  transition: all 0.2s ease;
+  border-left: 3px solid transparent;
 }
 
-.dropdownItem:hover {
-  background-color: #f8f9fa;
+.dropdownItem:hover,
+.dropdownItem:focus {
+  background: #F8F9FF;
+  border-left-color: var(--primary-color);
 }
 
-.dropdownItem:last-child {
-  border-bottom: none;
+.dropdownItem:active {
+  background: #EEF2FF;
 }
 
-.dropdownEmpty {
-  padding: 16px;
-  color: #666;
-  font-style: italic;
+.locationMeta {
+  opacity: 0.7;
+  font-size: 0.85rem;
+}
+
+.dropdownEmpty,
+.dropdownHint {
+  padding: 20px;
   text-align: center;
+  color: #6B7280;
+  font-size: 0.95rem;
 }
 
-.searchInput:focus + .dropdownList {
-  display: block;
+.dropdownHint {
+  color: #9CA3AF;
+  font-style: italic;
 }
 
-/* Hide dropdown when input is not focused */
-.searchInput:not(:focus) + .dropdownList {
-  display: none;
+.searchButton {
+  background: #F3F4F6;
+  border: 2px solid #E5E7EB;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 60px;
+  border-radius: 12px;
+  cursor: pointer;
+  flex-shrink: 0;
 }
 
-/* Property Grid */
+.searchButton img {
+  width: 24px;
+  height: 24px;
+  filter: brightness(0.6) grayscale(1);
+  /* Grey for disabled */
+  transition: filter 0.2s ease;
+}
+
+.searchButton.searchReady {
+  background: linear-gradient(135deg, var(--primary-color), #5A6BCE);
+  border-color: var(--primary-color);
+  box-shadow: 0 4px 12px rgba(107, 122, 237, 0.3);
+}
+
+.searchButton.searchReady img {
+  filter: brightness(0) invert(1);
+  /* White for ready state */
+}
+
+.searchButton.searchReady:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(107, 122, 237, 0.4);
+}
+
+.searchButton.searchReady:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(107, 122, 237, 0.3);
+}
+
+.searchButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.searchButton:disabled img {
+  filter: brightness(0.4) grayscale(1);
+}
+
+/* Hero Images Grid - FIXED for mobile */
 .propertyGrid {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr 1fr;
-  gap: 20px;
-  max-width: 1651px;
-  margin: 0 auto;
+  gap: 16px;
 }
 
 .propertyCard {
-  border-radius: 16px;
+  border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  transition: transform 0.3s ease;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
 }
 
 .propertyCard:hover {
@@ -178,19 +275,19 @@
 
 .propertyCard img {
   width: 100%;
-  height: 100%;
+  height: 350px;
   object-fit: cover;
-  display: block;
 }
 
 /* Card specific heights to match design */
-.card1 {
+/* .card1 {
   height: 400px;
 }
 
 .card2 {
   height: 400px;
   margin-top: 60px;
+}
 }
 
 .card3 {
@@ -200,7 +297,7 @@
 .card4 {
   height: 400px;
   margin-top: 60px;
-}
+} */
 
 /* Process Section */
 .processSection {
@@ -286,6 +383,13 @@
   color: var(--secondary-black);
   margin: 0;
 }
+
+.spacesSectionButton {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
 
 .exploreBtn {
   background: transparent;
@@ -571,7 +675,7 @@
   padding: 60px 0;
   position: relative;
   overflow: hidden;
-} 
+}
 
 
 .communityGrid {
@@ -957,16 +1061,12 @@
   }
 
   .searchContainer {
-    flex-direction: column;
-    padding: 16px;
+    gap: 10px;
+    align-items: center;
   }
 
   .inputWrapper {
     margin-bottom: 12px;
-  }
-
-  .searchButton {
-    width: 100%;
   }
 
   .propertiesGrid {
@@ -1006,7 +1106,7 @@
   }
 
   .locationFilters {
-    justify-content: center;
+    justify-content: start;
   }
 
   .propertiesGrid {
@@ -1049,7 +1149,7 @@
   }
 
   .communitySection {
-    padding: 60px 0;
+    padding: 60px 0 0 0px;
   }
 
   .communityGrid {
@@ -1121,29 +1221,89 @@
 
 @media (max-width: 480px) {
   .hero {
-    padding: 40px 0 60px;
+    padding: 60px 0;
   }
 
   .mainTitle {
-    font-size: 2rem;
+    font-size: 32px;
   }
 
-  .propertiesGrid {
+  .titleSection {
+    margin-bottom: 24px;
+  }
+
+  .searchForm {
+    margin-bottom: 24px;
+  }
+
+  .processGrid {
     grid-template-columns: 1fr;
-    max-width: 300px;
     gap: 20px;
+  }
+
+  .searchInput {
+    padding: 20px 16px 20px 48px;
+  }
+
+  .propertyGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .propertyGrid .propertyCard img {
+    height: 200px;
+  }
+
+  .propertyImage {
+    height: 200px;
   }
 
   .propertyCard {
     width: 100%;
+    border-radius: 10px;
+  }
+
+  .processTitle {
+    font-size: 20px;
+  }
+
+  .processCard {
+    border-radius: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+  }
+
+  .spacesHeader {
+    align-items: center;
+  }
+
+  .spacesTitle {
+    text-align: center;
+  }
+
+  .spacesTitle p {
+    font-size: 16px;
+  }
+
+  .locationFilters {
+    margin-bottom: 40px;
   }
 
   .amenitiesGrid {
     grid-template-columns: 1fr;
-    max-width: 300px;
   }
 
   .amenityCard {
+    width: 100%;
+  }
+
+  .communityImageContainer {
+    position: relative;
+    right: 0;
+  }
+
+  .communityImageContainer img{
     width: 100%;
   }
 
@@ -1167,6 +1327,10 @@
     text-align: center;
   }
 
+  .reviewsHeader{
+    margin-bottom: 40px;
+  }
+
   .reviewsTitle {
     font-size: 1.75rem;
   }
@@ -1178,10 +1342,6 @@
 
   .reviewText {
     font-size: 0.95rem;
-  }
-
-  .reviewImageContainer {
-    height: 180px;
   }
 
   .faqTitle {

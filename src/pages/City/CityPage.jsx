@@ -5,6 +5,8 @@ import axios from "axios";
 import styles from "./CityPage.module.css";
 import rating from "../../assets/star.svg";
 import { Helmet } from "react-helmet";
+import leftArrow from '../../assets/leftArrow.svg'
+import rightArrow from '../../assets/RightArrow.svg'
 
 const API_BASE = process.env.REACT_APP_API_BASE;
 const URL_BASE = process.env.REACT_APP_FRONTEND_BASE;
@@ -216,7 +218,7 @@ export default function CityPage() {
               <h1 className={styles.pageTitle}>
                 Coliving Spaces in {cityContent.displayCity || citySlug}
               </h1>
-              <button className={styles.filtersBtn} onClick={toggleFilters}>
+              <button className={`deskHide ${styles.filtersBtn}`} onClick={toggleFilters}>
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
                   <path d="M3 4.5H21V6H3V4.5Z" fill="currentColor" />
                   <path d="M3 11.25H15V12.75H3V11.25Z" fill="currentColor" />
@@ -318,7 +320,7 @@ export default function CityPage() {
                   onClick={() => setCurrentPage((p) => p - 1)}
                   disabled={!hasPrevPage}
                 >
-                  Previous
+                  <img src={leftArrow} alt="leftArrow" />
                 </button>
 
                 {/* Page numbers */}
@@ -345,7 +347,7 @@ export default function CityPage() {
                   onClick={() => setCurrentPage((p) => p + 1)}
                   disabled={!hasNextPage}
                 >
-                  Next
+                  <img src={rightArrow} alt="rightArrow" />
                 </button>
               </div>
             )}

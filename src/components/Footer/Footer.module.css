@@ -183,22 +183,46 @@
   .footer {
     padding: 40px 0 20px;
   }
-  
-  .mainHeading h1 {
-    font-size: 2rem;
+
+  .container{
+    padding: 0 12px;
+  }
+
+  .footerContent{
+    flex-direction: column;
+    gap: 24px;
+    margin-bottom: 40px;
+  }
+
+  .mainHeading{
+    margin-bottom: 24px;
+  }
+
+  .mainHeading h2 {
+    font-size: 50px;
   }
   
   .sectionTitle {
     font-size: 1.25rem;
+    margin-bottom: 12px;
   }
   
   .contactInfo p,
   .addressInfo p {
     font-size: 1rem;
+    margin-bottom: 8px;
   }
   
   .centerImage img {
-    width: 120px;
-    height: 120px;
+    width: 340px;
+    height: 340px;
+  }
+
+  .footerBottom{
+    flex-direction: row;
+  }
+
+  .footerBottom p, .footerBottom a{
+    font-size: 12px;
   }
 }
