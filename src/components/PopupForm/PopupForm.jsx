@@ -247,7 +247,7 @@ const PopupForm = ({ open, onClose, property, roomTypes = [] }) => {
                     {loading ? (
                       <>
                         <span className={styles.spinner}></span>
-                        Sending...
+                        Sending
                       </>
                     ) : (
                       "Enquire Now"
