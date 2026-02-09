@@ -85,6 +85,10 @@ h6 {
   display: inline-block;
 }
 
+.mobHide {
+  display: none;
+}
+
 /* Medium devices (tablets, landscape phones) */
 @media (max-width: 1024px) {
   .container {
@@ -105,4 +109,8 @@ h6 {
   .deskHide {
     display: none !important;
   }
+
+  .mobHide {
+  display: inline-flex !important;
+}
 }

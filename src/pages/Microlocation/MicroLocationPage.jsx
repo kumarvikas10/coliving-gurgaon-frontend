@@ -241,7 +241,7 @@ export default function MicroLocationPage() {
                 Coliving Space in{" "}
                 {microContent.displayLocation || locationData.name}
               </h1>
-              <button className={styles.filtersBtn}>
+              <button className={`deskHide ${styles.filtersBtn}`}>
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
                   <path d="M3 4.5H21V6H3V4.5Z" fill="currentColor" />
                   <path d="M3 11.25H15V12.75H3V11.25Z" fill="currentColor" />

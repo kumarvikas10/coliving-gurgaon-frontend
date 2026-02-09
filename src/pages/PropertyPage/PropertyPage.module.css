@@ -604,6 +604,28 @@
   display: none;
 }
 
+.rightContent {
+  height: -webkit-fit-content;
+  height: fit-content;
+  position: -webkit-sticky;
+  position: sticky;
+  top: 100px;
+}
+
+.fixedBottomFooter {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 1000;
+  background-color: #fff;
+  border-top: 1px solid rgba(0, 0, 0, .05);
+  padding: 15px 0 25px;
+  box-shadow: 0 0 7px #0000001a;
+  justify-content: space-around;
+    align-items: center;
+}
+
 
 /* Responsive Design */
 @media (max-width: 1024px) {
@@ -665,7 +687,7 @@
     margin-bottom: 12px;
   }
 
-  .sectionSubtitle{
+  .sectionSubtitle {
     font-size: 16px;
   }
 
@@ -682,11 +704,11 @@
     width: 20px;
   }
 
-  .roomType{
+  .roomType {
     font-size: 16px;
   }
 
-  .priceValue{
+  .priceValue {
     font-size: 18px;
   }
 
@@ -747,7 +769,7 @@
     margin-right: 10px;
   }
 
-  .locationSection{
+  .locationSection {
     padding: 0;
     border: none;
     margin-bottom: 40px;

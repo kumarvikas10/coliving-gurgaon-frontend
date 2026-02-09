@@ -350,17 +350,25 @@
   }
 
   .locationFilters {
-    justify-content: center;
+    justify-content: flex-start;
   }
 }
 
 @media (max-width: 480px) {
+
   .pageTitle {
-    font-size: 1.75rem;
+    font-size: 1.5rem;
   }
 
   .propertiesGrid {
     grid-template-columns: 1fr;
-    max-width: 394px;
+  }
+
+   .propertyImage{
+    height: 200px;
+  }
+
+  .viewMoreBtn {
+    width: 100%;
   }
 }

@@ -16,6 +16,7 @@ import Zoom from "yet-another-react-lightbox/plugins/zoom";
 import Fullscreen from "yet-another-react-lightbox/plugins/fullscreen";
 import "yet-another-react-lightbox/plugins/thumbnails.css";
 import { Helmet } from "react-helmet";
+import PopupForm from "../../components/PopupForm/PopupForm";
 
 const API_BASE = process.env.REACT_APP_API_BASE;
 const URL_BASE = process.env.REACT_APP_FRONTEND_BASE;
@@ -27,6 +28,7 @@ const PropertyPage = () => {
   const [allAmenities, setAllAmenities] = useState([]);
   const [allPlans, setAllPlans] = useState([]);
   const [selectedImage, setSelectedImage] = useState(0);
+  const [isModal, setIsModal] = useState(false);
 
   // Lightbox state
   const [lightboxOpen, setLightboxOpen] = useState(false);
@@ -229,7 +231,6 @@ const PropertyPage = () => {
         <meta name="twitter:image" content={twitterImage} />
       </Helmet>
       <div className={styles.propertyPage}>
-        {/* Breadcrumb */}
         <div className={styles.breadcrumb}>
           <div className={`container ${styles.container}`}>
             <Link to="/" className={styles.breadcrumbLink}>
@@ -246,8 +247,6 @@ const PropertyPage = () => {
             <span className={styles.breadcrumbCurrent}>{property.name}</span>
           </div>
         </div>
-
-        {/* Property Header */}
         <div className={styles.propertyHeader}>
           <div className={`container ${styles.container}`}>
             <div className={styles.propertyHead}>
@@ -481,7 +480,9 @@ const PropertyPage = () => {
                                   </h3>
                                 </div>
 
-                                <p className={`deskHide ${styles.roomDescription}`}>
+                                <p
+                                  className={`deskHide ${styles.roomDescription}`}
+                                >
                                   {room.description}
                                 </p>
 
@@ -572,6 +573,22 @@ const PropertyPage = () => {
           </div>
         </div>
       </div>
+      <div className={`mobHide ${styles.fixedBottomFooter}`}>
+        <div className={styles.priceSection}>
+          <p>
+            Starting from
+            <span>₹{property.startingPrice.toLocaleString()}/month</span>
+          </p>
+        </div>
+        <button
+          type="button"
+          className={styles.enquireBtn}
+          onClick={() => setIsModal(true)}
+        >
+          Enquire Now
+        </button>
+      </div>
+      <PopupForm property={property} roomTypes={enrichedPlans} open={isModal} onClose={() => setIsModal(false)} />
     </>
   );
 };
