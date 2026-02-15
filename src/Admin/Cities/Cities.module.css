@@ -18,15 +18,15 @@
     flex: 1;
 }
 
-.statusButton{
+.statusButton {
     background: none;
     border: none;
     color: white;
     cursor: pointer;
 }
 
-.statusButton img{
-     width: 30px;
+.statusButton img {
+    width: 30px;
 }
 
 .addButton {
@@ -128,4 +128,32 @@
 .tableWrapper {
     overflow-x: auto;
     max-width: 100%;
+}
+
+.deleteBtn img {
+    width: 18px;
+}
+
+.deleteBtn {
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.selectedRow {
+    background: #fef3c7 !important;
+}
+
+.dangerBtn {
+    font-size: 1rem;
+    background: #dc2626;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.dangerBtn:hover {
+    background: #b91c1c;
 }
