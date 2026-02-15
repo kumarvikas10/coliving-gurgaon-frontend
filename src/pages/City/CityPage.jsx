@@ -1,18 +1,28 @@
 // src/pages/city/CityPage.jsx
 import { useParams, Link } from "react-router-dom";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import axios from "axios";
 import styles from "./CityPage.module.css";
 import rating from "../../assets/star.svg";
 import { Helmet } from "react-helmet";
-import leftArrow from '../../assets/leftArrow.svg'
-import rightArrow from '../../assets/RightArrow.svg'
+import leftArrow from "../../assets/leftArrow.svg";
+import rightArrow from "../../assets/RightArrow.svg";
+import PopupForm from "../../components/PopupForm/PopupForm";
 
 const API_BASE = process.env.REACT_APP_API_BASE;
 const URL_BASE = process.env.REACT_APP_FRONTEND_BASE;
 
 export default function CityPage() {
   const { citySlug } = useParams();
+  const [isModal, setIsModal] = useState(false);
+  const [modalData, setModalData] = useState(null);
+  const [pageContext, setPageContext] = useState({
+    cityId: "",
+    microlocationId: "", // ✅ EMPTY for city page
+    cityName: "",
+    locationName: "", // ✅ EMPTY for city page
+  });
+
   const [cityData, setCityData] = useState(null);
   const [properties, setProperties] = useState([]);
   const [microlocations, setMicrolocations] = useState([]);
@@ -33,14 +43,28 @@ export default function CityPage() {
   });
   const [loading, setLoading] = useState(true);
 
+  const openEnquiry = useCallback(
+    (property = null) => {
+      setModalData({
+        cityId: pageContext.cityId,
+        microlocationId: pageContext.microlocationId, // "" (empty)
+        city: pageContext.cityName,
+        microlocation: pageContext.locationName, // "" (empty)
+        selectedProperty: property,
+      });
+      setIsModal(true);
+    },
+    [pageContext],
+  );
+
   const hasFooterTitle = useMemo(
     () => cityContent.footerTitle?.trim().length > 0,
-    [cityContent.footerTitle]
+    [cityContent.footerTitle],
   );
   const hasFooterDescription = useMemo(
     () =>
       cityContent.footerDescription?.replace(/<[^>]+>/g, "").trim().length > 0,
-    [cityContent.footerDescription]
+    [cityContent.footerDescription],
   );
 
   useEffect(() => {
@@ -50,25 +74,32 @@ export default function CityPage() {
     const load = async () => {
       setLoading(true);
       try {
-        // 1. Get city details by route slug (backend should resolve gurgaon/gurugram)
+        // 1. Get city details
         const cityContentRes = await axios.get(
           `${API_BASE}/api/cities/${citySlug}`,
-          { signal: controller.signal }
+          { signal: controller.signal },
         );
         if (cancelled) return;
 
         const cityContentData = cityContentRes.data;
-        setCityData(cityContentData);
-
-        // resolve city identifiers from backend
-        const apiCity = (cityContentData.city || "").toLowerCase();
+        const cityId = cityContentData._id || ""; // ✅ City MongoDB ID
         const displayCity =
           cityContentData.displayCity || cityContentData.city || citySlug;
+        const apiCity = (cityContentData.city || citySlug).toLowerCase();
 
-        // 2. Microlocations by apiCity
+        setPageContext({
+          cityId,
+          microlocationId: "",
+          cityName: displayCity,
+          locationName: "",
+        });
+
+        setCityData(cityContentData);
+
+        // 2. Microlocations
         const microRes = await axios.get(
           `${API_BASE}/api/microlocations/${apiCity}`,
-          { signal: controller.signal }
+          { signal: controller.signal },
         );
         if (cancelled) return;
 
@@ -89,17 +120,17 @@ export default function CityPage() {
           .filter(Boolean);
         setMicrolocations(normalizedMicros);
 
-        // 3. Properties using city _id from cityContent
+        // 3. Properties
         const propertiesRes = await axios.get(
-          `${API_BASE}/api/properties?city=${cityContentData._id}&status=approved`,
-          { signal: controller.signal }
+          `${API_BASE}/api/properties?city=${cityId}&status=approved`,
+          { signal: controller.signal },
         );
         if (cancelled) return;
 
         const propertyList = propertiesRes.data?.data || [];
         setProperties(propertyList);
 
-        // 4. CityContent (SEO + headings)
+        // 4. CityContent
         setCityContent({
           city: apiCity,
           displayCity,
@@ -125,6 +156,12 @@ export default function CityPage() {
             title: `Explore Coliving in ${fallbackDisplay}`,
             metaTitle: `Coliving Spaces in ${fallbackDisplay}`,
             metaDescription: `Find the best coliving spaces in ${fallbackDisplay}.`,
+          });
+          setPageContext({
+            cityId: "",
+            microlocationId: "",
+            cityName: citySlug,
+            locationName: "",
           });
         }
       } finally {
@@ -154,7 +191,7 @@ export default function CityPage() {
 
   const totalPages = useMemo(
     () => Math.ceil(properties.length / PROPERTIES_PER_PAGE),
-    [properties.length]
+    [properties.length],
   );
 
   const hasNextPage = currentPage < totalPages;
@@ -218,7 +255,10 @@ export default function CityPage() {
               <h1 className={styles.pageTitle}>
                 Coliving Spaces in {cityContent.displayCity || citySlug}
               </h1>
-              <button className={`deskHide ${styles.filtersBtn}`} onClick={toggleFilters}>
+              <button
+                className={`deskHide ${styles.filtersBtn}`}
+                onClick={toggleFilters}
+              >
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
                   <path d="M3 4.5H21V6H3V4.5Z" fill="currentColor" />
                   <path d="M3 11.25H15V12.75H3V11.25Z" fill="currentColor" />
@@ -300,7 +340,7 @@ export default function CityPage() {
                         onClick={(e) => {
                           e.preventDefault();
                           e.stopPropagation();
-                          // TODO: open enquiry modal or route to property detail
+                          openEnquiry(property);  
                         }}
                       >
                         Enquire Now
@@ -336,7 +376,7 @@ export default function CityPage() {
                       >
                         {page}
                       </button>
-                    )
+                    ),
                   )}
                 </div>
 
@@ -354,6 +394,17 @@ export default function CityPage() {
           </div>
         </section>
       </div>
+      <PopupForm
+        city={modalData?.cityId}
+        microlocation={modalData?.microlocation}
+        property={modalData?.selectedProperty || null}
+        roomTypes={[]}
+        open={isModal}
+        onClose={() => {
+          setIsModal(false);
+          setModalData(null);
+        }}
+      />
       {(hasFooterTitle || hasFooterDescription) && (
         <section className={`${styles.footer_div} mt-100 -mb-100`}>
           <div className={`container ${styles.container}`}>

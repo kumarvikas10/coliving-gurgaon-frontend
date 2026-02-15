@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import styles from "./BookingForm.module.css";
+import FormIcon from "../../assets/formSubmitIcon.svg";
 
 const BookingForm = ({ property, roomTypes }) => {
   const API_BASE =
@@ -14,6 +15,10 @@ const BookingForm = ({ property, roomTypes }) => {
     moveInDate: "",
   });
 
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [error, setError] = useState("");
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -24,11 +29,21 @@ const BookingForm = ({ property, roomTypes }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+     if (!formData.name || !formData.email || !formData.phone) {
+      setError("Please fill all required fields");
+      return;
+    }
+    setLoading(true);
+    setError("");
     const leadData = {
       ...formData,
       propertyId: property?._id,
+      propertyName: property?.name,
       city: property?.location?.city || "",
       microlocation: property?.location?.micro_locations?.[0] || "",
+      startingPrice: property?.startingPrice,
+
+      source: "property_booking_form",
       url: window.location.href,
       createdAt: new Date().toISOString(),
     };
@@ -41,8 +56,7 @@ const BookingForm = ({ property, roomTypes }) => {
       });
 
       if (res.ok) {
-        alert("Your enquiry was submitted successfully.");
-        // console.log(formData)
+        setSuccess(true);
         setFormData({
           name: "",
           email: "",
@@ -50,18 +64,47 @@ const BookingForm = ({ property, roomTypes }) => {
           roomType: "",
           moveInDate: "",
         });
+        setTimeout(() => setSuccess(false), 35000);
       } else {
-        alert("Failed to submit enquiry, please try again.");
+        setError("Failed to submit enquiry. Please try again.");
       }
     } catch (error) {
       console.error("Submit failed", error);
-      alert("An error occurred. Please try again.");
+      setError("An error occurred. Please try again.");
+    }finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
+    if (!success) setError("");
+  }, [success]);
+
+  useEffect(() => {
     console.log("property", roomTypes);
   }, [roomTypes]);
+
+  if (success) {
+    return (
+      <div className={`${styles.rightContent} ${styles.successContent}`}>
+        <div className={styles.successIcon}>
+          <img src={FormIcon} alt="Success" />
+        </div>
+        <h3 className={styles.successTitle}>Enquiry Sent Successfully!</h3>
+        <p className={styles.successMessage}>
+          Our team will reach out within 2 hours to help you book at{" "}
+          <strong>{property?.name}</strong>. Need it faster? Call us at{" "}
+          <span>+91-7827 063 300</span>.
+        </p>
+        <button 
+          className={styles.enquireAgainBtn}
+          onClick={() => setSuccess(false)}
+        >
+          Make Another Enquiry
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className={styles.rightContent}>

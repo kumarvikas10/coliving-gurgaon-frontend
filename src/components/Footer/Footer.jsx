@@ -18,7 +18,7 @@ const Footer = () => {
             <h3 className={styles.sectionTitle}>Contact</h3>
             <div className={styles.contactInfo}>
               <p className={styles.phone}>
-                <a href="tel:+918527613659">+91-7827063300</a>
+                <a href="tel:+917827063300">+91-7827 063 300</a>
               </p>
               <p className={styles.email}>
                 <a href="mailto:Hello@colivingspacegurgaon.com">

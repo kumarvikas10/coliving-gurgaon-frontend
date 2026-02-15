@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState, useMemo, useCallback } from "react";
 import { useParams, Link } from "react-router-dom";
 import axios from "axios";
 import styles from "./PropertyPage.module.css";
@@ -23,17 +23,43 @@ const URL_BASE = process.env.REACT_APP_FRONTEND_BASE;
 
 const PropertyPage = () => {
   const { citySlug, propertySlug } = useParams();
+  const [isModal, setIsModal] = useState(false);
+  const [modalData, setModalData] = useState(null);
+  const [pageContext, setPageContext] = useState({
+    cityId: "",
+    microlocationId: "",
+    propertyId: "", // ✅ Property-specific ID
+    cityName: "",
+    locationName: "",
+  });
+
   const [property, setProperty] = useState(null);
   const [loading, setLoading] = useState(true);
   const [allAmenities, setAllAmenities] = useState([]);
   const [allPlans, setAllPlans] = useState([]);
   const [selectedImage, setSelectedImage] = useState(0);
-  const [isModal, setIsModal] = useState(false);
 
   // Lightbox state
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
   const [showFullDescription, setShowFullDescription] = useState(false);
+
+  const openEnquiry = useCallback(
+    (propertyData = null) => {
+      console.log("🚀 DEBUG - pageContext:", pageContext);
+      setModalData({
+        cityId: pageContext.cityId,
+        microlocationId: pageContext.microlocationId,
+        propertyId: pageContext.propertyId, // ✅ Property MongoDB ID
+        city: pageContext.cityName,
+        microlocation: pageContext.locationName,
+        selectedProperty: propertyData || property, // Full property object
+      });
+      setIsModal(true);
+    },
+    [pageContext, property],
+  );
+
   const WORD_LIMIT = 80;
   const { isLong, previewText } = useMemo(() => {
     if (!property?.description) {
@@ -51,22 +77,41 @@ const PropertyPage = () => {
   const MAX_THUMBNAILS = 4;
 
   useEffect(() => {
-    if (!propertySlug) return;
     const fetchPropertyData = async () => {
       setLoading(true);
       try {
         const res = await axios.get(
           `${API_BASE}/api/properties/slug/${propertySlug}`,
         );
-        setProperty(res.data?.data || null);
+        const propertyData = res.data?.data || null;
+        console.log(propertyData.location?.micro_locations[0]);
+        setProperty(propertyData);
+
+        if (propertyData) {
+          const newContext = {
+            cityId: propertyData.location?.city || "",
+            microlocationId: propertyData.location?.micro_locations[0] || "", // ✅ KEY LINE
+            propertyId: propertyData._id || "",
+            cityName:
+              propertyData.city?.displayCity ||
+              propertyData.city?.city ||
+              citySlug,
+            locationName:
+              propertyData.microlocation?.displayLocation ||
+              propertyData.location?.address ||
+              "",
+          };
+          console.log("🔍 DEBUG - Property pageContext:", newContext); // Debug
+          setPageContext(newContext);
+        }
       } catch (err) {
-        setProperty(null);
+        console.error("Property fetch error:", err);
       } finally {
         setLoading(false);
       }
     };
     fetchPropertyData();
-  }, [propertySlug]);
+  }, [propertySlug, citySlug]);
 
   useEffect(() => {
     const fetchAmenities = async () => {
@@ -432,11 +477,7 @@ const PropertyPage = () => {
                       <button
                         type="button"
                         className={`deskHide ${styles.checkBtn}`}
-                        onClick={() =>
-                          document
-                            .getElementById("booking-form")
-                            ?.scrollIntoView({ behavior: "smooth" })
-                        }
+                        onClick={() => openEnquiry(property)}
                         aria-label="Check availability"
                       >
                         Check availability
@@ -536,11 +577,7 @@ const PropertyPage = () => {
                                 <button
                                   type="button"
                                   className={styles.enquireBtn}
-                                  onClick={() =>
-                                    document
-                                      .getElementById("booking-form")
-                                      ?.scrollIntoView({ behavior: "smooth" })
-                                  }
+                                  onClick={() => openEnquiry(property)}
                                 >
                                   Enquire Now
                                 </button>
@@ -583,12 +620,19 @@ const PropertyPage = () => {
         <button
           type="button"
           className={styles.enquireBtn}
-          onClick={() => setIsModal(true)}
+          onClick={() => openEnquiry(property)}
         >
           Enquire Now
         </button>
       </div>
-      <PopupForm property={property} roomTypes={enrichedPlans} open={isModal} onClose={() => setIsModal(false)} />
+      <PopupForm
+        city={modalData?.cityId}
+        microlocation={modalData?.microlocationId}
+        property={modalData?.selectedProperty || property}
+        roomTypes={enrichedPlans}
+        open={isModal}
+        onClose={() => setIsModal(false)}
+      />
     </>
   );
 };

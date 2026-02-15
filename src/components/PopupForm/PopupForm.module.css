@@ -9,9 +9,9 @@
 }
 
 .modal {
-    background: white;
-    border-radius: 24px;
-    max-width: 520px;
+    background: #EDEFFF;
+    border-radius: 20px;
+    max-width: 876px;
     max-height: 90vh;
     width: 100%;
     position: relative;
@@ -39,22 +39,69 @@
     color: #333;
 }
 
+.mainFormDiv {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    position: relative;
+}
+
+.rightContent {
+    flex: 1;
+    z-index: 1;
+    background: #fff;
+}
+
+.leftContent {
+    flex: 1;
+    width: 400px;
+    padding: 80px 40px 0 40px;
+}
+
+.leftContent h2 {
+    font-size: 32px;
+    font-weight: 600;
+}
+
+.leftContent p {
+    font-size: 16px;
+}
+
+.leftContent a {
+    color: #1a1a1a;
+    text-decoration: none;
+}
+
+.leftContent .highlight {
+    color: var(--primary-color);
+    font-weight: 700;
+}
+
+
+.leftContent img {
+    position: absolute;
+    top: 0;
+    left: 40px;
+    max-width: 437px;
+}
+
 /* Form Styles */
 .bookingForm {
     padding: 40px;
 }
 
 .formHeader h3 {
-    font-size: 28px;
+    font-size: 22px;
     font-weight: 700;
     margin: 0 0 8px 0;
     color: #1a1a1a;
 }
 
 .formSubtitle {
-    color: #666;
+    color: var(--primary-color);
     margin: 0 0 32px 0;
     font-size: 16px;
+    font-weight: 600;
 }
 
 .formGroup {
@@ -64,9 +111,9 @@
 .formInput,
 .formInput:focus {
     width: 100%;
-    padding: 16px 20px;
+    padding: 12px 10px;
     border: 2px solid #e5e7eb;
-    border-radius: 12px;
+    border-radius: 10px;
     font-size: 16px;
     transition: all 0.3s ease;
     background: white;
@@ -105,9 +152,9 @@
     background: linear-gradient(135deg, #6376E8 0%, #5A6BCE 100%);
     color: white;
     border: none;
-    padding: 18px;
-    border-radius: 16px;
-    font-size: 18px;
+    padding: 12px;
+    border-radius: 10px;
+    font-size: 16px;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
@@ -175,15 +222,14 @@
     text-align: center;
 }
 
-.successIcon {
-    font-size: 64px;
-    margin-bottom: 20px;
+.successIcon img {
+    width: 50px
 }
 
 .successTitle {
     font-size: 28px;
     font-weight: 700;
-    color: #10b981;
+    color: var(--primary-color);
     margin: 0 0 16px 0;
 }
 
@@ -254,13 +300,18 @@
         box-sizing: border-box !important;
         position: relative !important;
         align-items: stretch !important;
+        background: #fff;
+    }
+
+    .leftContent {
+        display: none;
     }
 
     .bookingForm {
         padding: 0;
     }
 
-    .formHeader{
+    .formHeader {
         margin-bottom: 24px;
     }
 
@@ -268,7 +319,7 @@
         font-size: 20px;
     }
 
-    .formInput{
+    .formInput {
         padding: 12px;
         font-size: 16px;
         border-radius: 8px;
@@ -280,8 +331,26 @@
     }
 
 
-    .enquireBtn{
+    .enquireBtn {
         padding: 12px;
         border-radius: 8px;
+    }
+
+    .successContent {
+        padding: 24px;
+    }
+
+    .successIcon img {
+        width: 80px;
+        margin-bottom: 12px;
+    }
+
+    .successTitle {
+        font-size: 24px;
+    }
+
+    .successMessage span{
+        font-weight: 700;
+        color: var(--primary-color);
     }
 }

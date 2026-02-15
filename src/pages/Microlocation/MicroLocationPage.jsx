@@ -1,10 +1,11 @@
 // src/pages/microlocation/MicroLocationPage.jsx
 import { useParams, Link } from "react-router-dom";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useCallback } from "react";
 import axios from "axios";
 import styles from "./MicroLocationPage.module.css";
 import rating from "../../assets/star.svg";
 import { Helmet } from "react-helmet";
+import PopupForm from "../../components/PopupForm/PopupForm";
 
 const API_BASE = process.env.REACT_APP_API_BASE;
 const URL_BASE = process.env.REACT_APP_FRONTEND_BASE;
@@ -16,7 +17,16 @@ const humanize = (slug) =>
     .join(" ");
 
 export default function MicroLocationPage() {
+  const [isModal, setIsModal] = useState(false);
+  const [modalData, setModalData] = useState(null);
   const { citySlug, locationSlug } = useParams();
+  const [pageContext, setPageContext] = useState({
+    cityId: "",
+    microlocationId: "",
+    cityName: "",
+    locationName: "",
+  });
+
   const [locationData, setLocationData] = useState(null); // header/stat card
   const [properties, setProperties] = useState([]); // cards grid (sample until API)
   const [nearbyLocations, setNearbyLocations] = useState([]); // chips
@@ -36,12 +46,26 @@ export default function MicroLocationPage() {
 
   const hasFooterTitle = useMemo(
     () => microContent.footerTitle?.trim().length > 0,
-    [microContent.footerTitle]
+    [microContent.footerTitle],
   );
   const hasFooterDescription = useMemo(
     () =>
       microContent.footerDescription?.replace(/<[^>]+>/g, "").trim().length > 0,
-    [microContent.footerDescription]
+    [microContent.footerDescription],
+  );
+
+  const openEnquiry = useCallback(
+    (property = null) => {
+      setModalData({
+        cityId: pageContext.cityId,
+        microlocationId: pageContext.microlocationId,
+        city: pageContext.cityName,
+        microlocation: pageContext.locationName,
+        selectedProperty: property,
+      });
+      setIsModal(true);
+    },
+    [pageContext],
   );
 
   useEffect(() => {
@@ -50,27 +74,36 @@ export default function MicroLocationPage() {
 
     const load = async () => {
       setLoading(true);
-
       try {
-        // 1) Microlocation content with _id (backend must resolve citySlug -> city)
+        // 1) Microlocation content
         const contentRes = await axios.get(
           `${API_BASE}/api/microlocations/${citySlug}/${locationSlug}`,
-          { signal: controller.signal }
+          { signal: controller.signal },
         );
         if (cancelled) return;
         const microlocationData = contentRes.data;
 
-        // resolve city identifiers from backend
+        // ✅ FIX 2: Define BEFORE using
         const cityObj = microlocationData.city || {};
+        const cityId = cityObj._id || "";
+        const microlocationId = microlocationData._id || "";
         const apiCity = (cityObj.city || citySlug || "").toLowerCase();
         const displayCity = cityObj.displayCity || cityObj.city || citySlug;
         const displayLocation =
           microlocationData.displayLocation || humanize(locationSlug);
 
-        // 2) All microlocations for chips UI (by apiCity)
+        // ✅ FIXED: Now cityId/microlocationId are defined
+        setPageContext({
+          cityId,
+          microlocationId,
+          cityName: displayCity,
+          locationName: displayLocation,
+        });
+
+        // 2) Chips
         const chipsRes = await axios.get(
           `${API_BASE}/api/microlocations/${apiCity}`,
-          { signal: controller.signal }
+          { signal: controller.signal },
         );
         if (cancelled) return;
 
@@ -78,10 +111,7 @@ export default function MicroLocationPage() {
         const normalizedChips = rawChips
           .map((ml) =>
             typeof ml === "string"
-              ? {
-                  name: ml,
-                  slug: ml.toLowerCase().trim().replace(/\s+/g, "-"),
-                }
+              ? { name: ml, slug: ml.toLowerCase().trim().replace(/\s+/g, "-") }
               : {
                   name: ml?.name ?? ml?.displayLocation ?? "",
                   slug:
@@ -90,26 +120,22 @@ export default function MicroLocationPage() {
                       .toLowerCase()
                       .trim()
                       .replace(/\s+/g, "-"),
-                }
+                },
           )
           .filter((i) => i.name && i.slug);
-
         setNearbyLocations(normalizedChips);
 
-        // 3) Properties using city._id and microlocation _id
-        const cityId = cityObj._id || "";
-        const microlocationId = microlocationData._id;
-
+        // 3) Properties
         const propsRes = await axios.get(
           `${API_BASE}/api/properties?city=${cityId}&micro=${microlocationId}&status=approved`,
-          { signal: controller.signal }
+          { signal: controller.signal },
         );
         if (cancelled) return;
 
         const propertyList = propsRes.data?.data || [];
         setProperties(propertyList);
 
-        // 4) microContent (SEO + headings)
+        // 4) microContent
         setMicroContent({
           title:
             microlocationData.title || `Coliving Space in ${displayLocation}`,
@@ -127,7 +153,7 @@ export default function MicroLocationPage() {
           displayCity,
         });
 
-        // 5) locationData with stats
+        // 5) locationData
         setLocationData({
           name: displayLocation,
           city: displayCity,
@@ -153,6 +179,12 @@ export default function MicroLocationPage() {
             displayLocation: fallbackLocation,
             displayCity: citySlug,
           }));
+          setPageContext({
+            cityId: "",
+            microlocationId: "",
+            cityName: citySlug,
+            locationName: fallbackLocation,
+          });
         }
       } finally {
         if (!cancelled) setLoading(false);
@@ -322,7 +354,7 @@ export default function MicroLocationPage() {
                         onClick={(e) => {
                           e.preventDefault();
                           e.stopPropagation();
-                          // TODO: open enquiry modal or route to property detail
+                          openEnquiry(property);
                         }}
                       >
                         Enquire Now
@@ -335,6 +367,17 @@ export default function MicroLocationPage() {
           </div>
         </section>
       </div>
+      <PopupForm
+        city={modalData?.cityId}
+        microlocation={modalData?.microlocationId}
+        property={modalData?.selectedProperty || null}
+        roomTypes={[]}
+        open={isModal}
+        onClose={() => {
+          setIsModal(false);
+          setModalData(null);
+        }}
+      />
       {(hasFooterTitle || hasFooterDescription) && (
         <section className={`${styles.footer_div} mt-100 -mb-100`}>
           <div className={`container ${styles.container}`}>

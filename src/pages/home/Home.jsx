@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback} from "react";
 import axios from "axios";
 import styles from "./Home.module.css";
 import location from "../../assets/Location.svg";
@@ -26,6 +26,7 @@ import reviewImage1 from "../../assets/review-image-1.png";
 import reviewImage2 from "../../assets/review-image-2.png";
 import { Helmet } from "react-helmet";
 import SearchImg from '../../assets/search.svg'
+import PopupForm from "../../components/PopupForm/PopupForm";
 
 const API_BASE = process.env.REACT_APP_API_BASE;
 const URL_BASE = process.env.REACT_APP_FRONTEND_BASE;
@@ -70,6 +71,14 @@ const FAQItem = ({ question, answer, defaultOpen = false }) => {
 };
 
 const Home = () => {
+  const [isModal, setIsModal] = useState(false);        
+  const [modalData, setModalData] = useState(null);     
+  const [pageContext, setPageContext] = useState({  
+    cityId: "",
+    microlocationId: "",
+    cityName: "",
+    locationName: "",
+  });
   const [properties, setProperties] = useState([]);
   const [loadingProps, setLoadingProps] = useState(false);
   const [errProps, setErrProps] = useState("");
@@ -84,6 +93,19 @@ const Home = () => {
   const [microlocations, setMicrolocations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState("");
+
+  const openEnquiry = useCallback((property = null) => {
+  setModalData({
+    cityId: "",                           
+    microlocationId: "",                 
+    propertyId: property?._id || null,
+    city: "",                           
+    microlocation: "",                    
+    selectedProperty: property,
+  });
+  setIsModal(true);
+}, []);
+
 
   useEffect(() => {
     const controller = new AbortController();
@@ -494,7 +516,7 @@ const Home = () => {
                       onClick={(e) => {
                         e.preventDefault();
                         e.stopPropagation();
-                        // TODO: open enquiry modal or route to property detail
+                        openEnquiry(property);  
                       }}
                     >
                       Enquire Now
@@ -891,6 +913,17 @@ const Home = () => {
           </div>
         </div>
       </section>
+      <PopupForm
+        city={modalData?.cityId}
+        microlocation={modalData?.microlocation}
+        property={modalData?.selectedProperty || null}
+        roomTypes={[]}
+        open={isModal}
+        onClose={() => {
+          setIsModal(false);
+          setModalData(null);
+        }}
+      />
     </>
   );
 };

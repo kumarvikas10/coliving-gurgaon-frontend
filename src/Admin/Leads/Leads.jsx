@@ -1,5 +1,5 @@
 // src/admin/Leads/Leads.jsx
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import axios from "axios";
 import { ClipLoader } from "react-spinners";
 import styles from "../Cities/Cities.module.css";
@@ -10,6 +10,7 @@ export default function Leads() {
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState("");
+  const [propertiesCache, setPropertiesCache] = useState({});
 
   // Filters
   const [filterCity, setFilterCity] = useState("");
@@ -22,13 +23,49 @@ export default function Leads() {
   const [microsAll, setMicrosAll] = useState([]);
   const [microsFilter, setMicrosFilter] = useState([]);
 
+  const propertyName = useCallback(
+    (lead) => {
+      if (!lead.propertyId) return "-";
+
+      // Check cache first
+      if (propertiesCache[lead.propertyId]) {
+        return propertiesCache[lead.propertyId];
+      }
+
+      return `ID:${lead.propertyId.slice(-6)}`; // Fallback
+    },
+    [propertiesCache],
+  );
+
+  useEffect(() => {
+    const loadPropertiesCache = async () => {
+      try {
+        const res = await axios.get(
+          `${API_BASE}/api/properties?status=approved&limit=500`,
+        );
+        const props = res.data?.data || [];
+        const cache = {};
+
+        props.forEach((p) => {
+          cache[p._id] = p.name || `Unnamed (${p._id.slice(-6)})`;
+        });
+
+        setPropertiesCache(cache);
+      } catch (e) {
+        console.error("Failed to load properties cache:", e);
+      }
+    };
+
+    loadPropertiesCache();
+  }, []);
+
   // Helpers to adapt city/microlocation response
   const adaptCities = (raw) => {
     const list = Array.isArray(raw?.data)
       ? raw.data
       : Array.isArray(raw)
-      ? raw
-      : raw?.data?.data || [];
+        ? raw
+        : raw?.data?.data || [];
     return list
       .map((c) => ({
         id: c._id || c.id || c.city_id,
@@ -43,8 +80,8 @@ export default function Leads() {
     const list = Array.isArray(raw?.data)
       ? raw.data
       : Array.isArray(raw)
-      ? raw
-      : raw?.data?.data || [];
+        ? raw
+        : raw?.data?.data || [];
     return list
       .map((m) => ({
         id: m._id || m.id,
@@ -94,11 +131,11 @@ export default function Leads() {
       if (!filterCity) return;
       try {
         const cityMeta = cities.find(
-          (c) => String(c.id) === String(filterCity)
+          (c) => String(c.id) === String(filterCity),
         );
         const key = cityMeta?.slug || filterCity;
         const res = await axios.get(
-          `${API_BASE}/api/microlocations/${encodeURIComponent(key)}`
+          `${API_BASE}/api/microlocations/${encodeURIComponent(key)}`,
         );
         setMicrosFilter(adaptMicros(res.data || res));
       } catch (e) {
@@ -147,7 +184,7 @@ export default function Leads() {
 
   const microName = (lead) => {
     const m = microsAll.find(
-      (m) => String(m.id) === String(lead.microlocation)
+      (m) => String(m.id) === String(lead.microlocation),
     );
     return m ? m.name : lead.microlocation || "-";
   };
@@ -221,14 +258,14 @@ export default function Leads() {
           placeholder="To Date"
         />
         <button
-          className={styles.addButton}
+          className="btn primaryBtn"
           onClick={fetchRows}
           disabled={loading}
         >
           Apply
         </button>
         <button
-          className={styles.cancelButton}
+          className="btn secondaryBtn"
           onClick={clearFilters}
           disabled={loading}
         >
@@ -249,7 +286,8 @@ export default function Leads() {
               <th style={{ width: "12%" }}>Microlocation</th>
               <th style={{ width: "12%" }}>Room Type</th>
               <th style={{ width: "12%" }}>Move In Date</th>
-              <th style={{ width: "14%" }}>Page URL</th>
+              <th style={{ width: "10%" }}>Property</th>
+              {/* <th style={{ width: "14%" }}>Page URL</th> */}
             </tr>
           </thead>
           <tbody>
@@ -268,11 +306,14 @@ export default function Leads() {
                     ? new Date(lead.moveInDate).toLocaleDateString()
                     : "-"}
                 </td>
-                <td style={{ maxWidth: 200 }}>
+                <td title={lead.propertyId}>
+                  <a href={lead.url} target="_blank" rel="noopener noreferrer">{propertyName(lead)}</a>
+                  </td>
+                {/* <td style={{ maxWidth: 200 }}>
                   <a href={lead.url} target="_blank" rel="noopener noreferrer">
                     {lead.url}
                   </a>
-                </td>
+                </td> */}
               </tr>
             ))}
             {!rows.length && !loading && (
