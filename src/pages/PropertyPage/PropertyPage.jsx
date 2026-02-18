@@ -412,7 +412,7 @@ const PropertyPage = () => {
                 {/* Dots OUTSIDE scroll container */}
                 <div className={styles.dots}>
                   {property.images?.slice(0, 4).map((_, index) => (
-                    <button
+                    <span
                       key={index}
                       className={`${styles.dot} ${
                         selectedImage === index ? styles.activeDot : ""
