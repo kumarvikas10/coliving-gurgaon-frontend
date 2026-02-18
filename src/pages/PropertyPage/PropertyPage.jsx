@@ -7,8 +7,6 @@ import rating from "../../assets/star.svg";
 import price from "../../assets/price.svg";
 import BookingForm from "../../components/BookingForm/BookingForm";
 import LocationSection from "../../components/LocationSection/LocationSection";
-
-// Import Yet Another React Lightbox
 import Lightbox from "yet-another-react-lightbox";
 import "yet-another-react-lightbox/styles.css";
 import Thumbnails from "yet-another-react-lightbox/plugins/thumbnails";
@@ -17,6 +15,7 @@ import Fullscreen from "yet-another-react-lightbox/plugins/fullscreen";
 import "yet-another-react-lightbox/plugins/thumbnails.css";
 import { Helmet } from "react-helmet";
 import PopupForm from "../../components/PopupForm/PopupForm";
+import { useRef } from "react";
 
 const API_BASE = process.env.REACT_APP_API_BASE;
 const URL_BASE = process.env.REACT_APP_FRONTEND_BASE;
@@ -43,6 +42,35 @@ const PropertyPage = () => {
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
   const [showFullDescription, setShowFullDescription] = useState(false);
+
+  const carouselRef = useRef(null);
+
+  const scrollToSlide = (index) => {
+    if (!carouselRef.current) return;
+
+    const slideWidth = carouselRef.current.clientWidth;
+    carouselRef.current.scrollTo({
+      left: slideWidth * index,
+      behavior: "smooth",
+    });
+
+    setSelectedImage(index);
+  };
+
+  useEffect(() => {
+    const el = carouselRef.current;
+    if (!el) return;
+
+    const handleScroll = () => {
+      const slideWidth = el.clientWidth;
+      const index = Math.round(el.scrollLeft / slideWidth);
+      setSelectedImage(index);
+    };
+
+    el.addEventListener("scroll", handleScroll);
+
+    return () => el.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const openEnquiry = useCallback(
     (propertyData = null) => {
@@ -292,127 +320,161 @@ const PropertyPage = () => {
             <span className={styles.breadcrumbCurrent}>{property.name}</span>
           </div>
         </div>
-        <div className={styles.propertyHeader}>
-          <div className={`container ${styles.container}`}>
-            <div className={styles.propertyHead}>
-              <div>
-                <h1 className={styles.propertyTitle}>{property.name}</h1>
-                <p className={styles.propertyLocation}>
-                  <span>
-                    <img src={rating} alt="rating" />
-                    {property.rating}
-                  </span>
-                  <span>|</span>
-                  <span>
-                    <img src={location} alt="location" />
-                    {property.location.address}
-                  </span>
-                  <span>|</span>
-                  <span>
-                    <img src={price} alt="price" />
-                    Best price <div className="deskHide">guarantee</div>
-                  </span>
-                </p>
-              </div>
-              <div className={`deskHide ${styles.priceSection}`}>
-                <p>
-                  Starting from
-                  <span>₹{property.startingPrice.toLocaleString()}/month</span>
-                </p>
+        <div className={styles.heroSection}>
+          <div className={styles.propertyHeader}>
+            <div className={`container ${styles.container}`}>
+              <div className={styles.propertyHead}>
+                <div>
+                  <h1 className={styles.propertyTitle}>{property.name}</h1>
+                  <p className={styles.propertyLocation}>
+                    <span>
+                      <img src={rating} alt="rating" />
+                      {property.rating}
+                    </span>
+                    <span>|</span>
+                    <span>
+                      <img src={location} alt="location" />
+                      {property.location.address}
+                    </span>
+                    <span>|</span>
+                    <span>
+                      <img src={price} alt="price" />
+                      Best price <div className="deskHide">guarantee</div>
+                    </span>
+                  </p>
+                </div>
+                <div className={`deskHide ${styles.priceSection}`}>
+                  <p>
+                    Starting from
+                    <span>
+                      ₹{property.startingPrice.toLocaleString()}/month
+                    </span>
+                  </p>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-        <div className={styles.propertyImages}>
-          <div className={`container ${styles.container}`}>
-            <div className={styles.imageGallery}>
-              {property.images?.length > 0 && (
-                <div
-                  className={styles.largeImage}
-                  onClick={() => openLightbox(0)}
-                >
-                  {property.images && property.images.length > 0 && (
-                    <img
-                      src={property.images[0].secureUrl}
-                      alt={property.name}
-                    />
-                  )}
-                  <div className={styles.viewAllPhotos}>
-                    View all {property.images.length} photos
+          <div className={styles.propertyImages}>
+            <div className={`container ${styles.propertyContainer}`}>
+              <div className={styles.imageGallery}>
+                {property.images?.length > 0 && (
+                  <div
+                    className={styles.largeImage}
+                    onClick={() => openLightbox(0)}
+                  >
+                    {property.images && property.images.length > 0 && (
+                      <img
+                        src={property.images[0].secureUrl}
+                        alt={property.name}
+                      />
+                    )}
+                    <div className={styles.viewAllPhotos}>
+                      View all {property.images.length} photos
+                    </div>
                   </div>
+                )}
+                <div className={styles.smallImages}>
+                  {property.images
+                    ?.slice(1, MAX_THUMBNAILS + 1)
+                    .map((img, idx) => (
+                      <div
+                        key={img.publicId}
+                        className={`${styles.smallImage} ${
+                          selectedImage === idx + 1 ? styles.active : ""
+                        }`}
+                        onClick={() => handleThumbnailClick(idx + 1)}
+                      >
+                        <img
+                          src={img.secureUrl}
+                          alt={`${property.name} Image ${idx + 2}`}
+                        />
+                      </div>
+                    ))}
                 </div>
-              )}
-              <div className={styles.smallImages}>
-                {property.images
-                  ?.slice(1, MAX_THUMBNAILS + 1)
-                  .map((img, idx) => (
+              </div>
+              {/* Mobile Carousel */}
+              <div className={styles.mobileCarouselWrapper}>
+                <div className={styles.mobileCarousel} ref={carouselRef}>
+                  {(property.images || []).map((img, index) => (
                     <div
                       key={img.publicId}
-                      className={`${styles.smallImage} ${
-                        selectedImage === idx + 1 ? styles.active : ""
-                      }`}
-                      onClick={() => handleThumbnailClick(idx + 1)}
+                      className={styles.mobileSlide}
+                      onClick={() => openLightbox(index)}
                     >
                       <img
                         src={img.secureUrl}
-                        alt={`${property.name} Image ${idx + 2}`}
+                        alt={`${property.name} ${index + 1}`}
                       />
                     </div>
                   ))}
-              </div>
-            </div>
+                </div>
 
-            {/* Lightbox Component - Shows ALL images */}
-            <Lightbox
-              open={lightboxOpen}
-              close={() => setLightboxOpen(false)}
-              index={lightboxIndex}
-              slides={(property.images || []).map((img, index) => ({
-                src: img.secureUrl,
-                alt: `${property.name} - Image ${index + 1}`,
-                width: 1200,
-                height: 800,
-              }))}
-              plugins={[Thumbnails, Zoom, Fullscreen]}
-              thumbnails={{
-                position: "bottom",
-                width: 120,
-                height: 80,
-                border: 0,
-                borderRadius: 8,
-                padding: 4,
-                gap: 8,
-              }}
-              zoom={{
-                maxZoomPixelRatio: 3,
-                zoomInMultiplier: 2,
-                doubleTapDelay: 300,
-                doubleClickDelay: 300,
-                doubleClickMaxStops: 2,
-                keyboardMoveDistance: 50,
-                wheelZoomDistanceFactor: 100,
-                pinchZoomDistanceFactor: 100,
-                scrollToZoom: true,
-              }}
-              carousel={{
-                finite: true,
-                preload: 2,
-                padding: "16px",
-                spacing: "30%",
-                imageFit: "contain",
-              }}
-              render={{
-                buttonPrev:
-                  property.images.length <= 1 ? () => null : undefined,
-                buttonNext:
-                  property.images.length <= 1 ? () => null : undefined,
-              }}
-              controller={{
-                closeOnBackdropClick: true,
-                closeOnPullDown: true,
-                closeOnPullUp: true,
-              }}
-            />
+                {/* Dots OUTSIDE scroll container */}
+                <div className={styles.dots}>
+                  {property.images?.slice(0, 4).map((_, index) => (
+                    <button
+                      key={index}
+                      className={`${styles.dot} ${
+                        selectedImage === index ? styles.activeDot : ""
+                      }`}
+                      onClick={() => scrollToSlide(index)}
+                    />
+                  ))}
+                </div>
+              </div>
+
+              {/* Lightbox Component - Shows ALL images */}
+              <Lightbox
+                open={lightboxOpen}
+                close={() => setLightboxOpen(false)}
+                index={lightboxIndex}
+                slides={(property.images || []).map((img, index) => ({
+                  src: img.secureUrl,
+                  alt: `${property.name} - Image ${index + 1}`,
+                  width: 1200,
+                  height: 800,
+                }))}
+                plugins={[Thumbnails, Zoom, Fullscreen]}
+                thumbnails={{
+                  position: "bottom",
+                  width: 120,
+                  height: 80,
+                  border: 0,
+                  borderRadius: 8,
+                  padding: 4,
+                  gap: 8,
+                }}
+                zoom={{
+                  maxZoomPixelRatio: 3,
+                  zoomInMultiplier: 2,
+                  doubleTapDelay: 300,
+                  doubleClickDelay: 300,
+                  doubleClickMaxStops: 2,
+                  keyboardMoveDistance: 50,
+                  wheelZoomDistanceFactor: 100,
+                  pinchZoomDistanceFactor: 100,
+                  scrollToZoom: true,
+                }}
+                carousel={{
+                  finite: true,
+                  preload: 2,
+                  padding: "16px",
+                  spacing: "30%",
+                  imageFit: "contain",
+                }}
+                render={{
+                  buttonPrev:
+                    property.images.length <= 1 ? () => null : undefined,
+                  buttonNext:
+                    property.images.length <= 1 ? () => null : undefined,
+                }}
+                controller={{
+                  closeOnBackdropClick: true,
+                  closeOnPullDown: true,
+                  closeOnPullUp: true,
+                }}
+              />
+            </div>
           </div>
         </div>
         <div className={styles.propertyContent}>

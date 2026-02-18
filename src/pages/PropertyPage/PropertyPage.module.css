@@ -41,7 +41,20 @@
 
 .propertyPage {
   background: #ffffff;
-  /* min-height: 100vh; */
+
+}
+
+.heroSection {
+  display: flex;
+  flex-direction: column;
+}
+
+.propertyHeader {
+  order: 1;
+}
+
+.propertyImages {
+  order: 2;
 }
 
 .loading,
@@ -620,11 +633,16 @@
   z-index: 1000;
   background-color: #fff;
   border-top: 1px solid rgba(0, 0, 0, .05);
-  padding: 15px 0 25px;
+  padding: 15px 0 20px;
   box-shadow: 0 0 7px #0000001a;
   justify-content: space-around;
-    align-items: center;
+  align-items: center;
 }
+
+.mobileCarouselWrapper {
+  display: none;
+}
+
 
 
 /* Responsive Design */
@@ -640,7 +658,8 @@
 
 @media (max-width: 768px) {
   .propertyImages {
-    padding: 20px 0;
+    padding: 0;
+    padding-bottom: 24px;
   }
 
   .imageGallery {
@@ -666,6 +685,21 @@
 }
 
 @media (max-width: 480px) {
+
+  .propertyHeader {
+    order: 2;
+    /* move header below */
+  }
+
+  .propertyImages {
+    order: 1;
+    /* move images above */
+  }
+
+  .propertyContainer{
+    padding: 0;
+    border-radius: 0;
+  }
 
   .propertyContent {
     padding: 0;
@@ -794,5 +828,62 @@
 
   .moreImagesOverlay {
     font-size: 0.7rem;
+  }
+
+  .imageGallery {
+    display: none;
+  }
+
+  .mobileCarouselWrapper {
+    display: block;
+    position: relative;
+  }
+
+  .mobileCarousel {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    gap: 12px;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .mobileCarousel::-webkit-scrollbar {
+    display: none;
+  }
+
+  .mobileSlide {
+    flex: 0 0 100%;
+    scroll-snap-align: start;
+    overflow: hidden;
+  }
+
+  .mobileSlide img {
+    width: 100%;
+    height: 300px;
+    object-fit: cover;
+  }
+
+  .dots {
+    position: absolute;
+    bottom: 12px;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    pointer-events: auto;
+  }
+
+  .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.6);
+    border: none;
+  }
+
+  .activeDot {
+    background: #fff;
   }
 }
