@@ -399,7 +399,6 @@ const PropertyPage = () => {
                     <div
                       key={img.publicId}
                       className={styles.mobileSlide}
-                      onClick={() => openLightbox(index)}
                     >
                       <img
                         src={img.secureUrl}
