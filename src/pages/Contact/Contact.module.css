@@ -1,0 +1,41 @@
+.contactUs {
+    display: flex;
+    justify-content: center;
+    margin-top: 60px;
+    align-items: center;
+    text-align: center;
+}
+
+.aboutHeading h2 {
+    font-size: 3.5rem;
+    font-weight: 600;
+    color: var(--primary-black);
+    margin-bottom: 16px;
+    line-height: 1.2;
+}
+
+.aboutHeading h2 span {
+    color: var(--primary-color);
+}
+
+.aboutHeading p {
+    font-size: 1.1rem;
+    color: #868585;
+    line-height: 1.6;
+    margin-bottom: 24px;
+}
+
+.contactDiv {
+  margin: 60px 0;
+}
+
+
+@media (max-width:480px) {
+    .aboutHeading h2{
+        font-size: 32px;
+    }
+
+    .aboutHeading p{
+        font-size: 16px;
+    }
+}

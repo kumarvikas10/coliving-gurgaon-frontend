@@ -1,0 +1,351 @@
+.formWrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #EDEFFF;
+    border-radius: 20px;
+}
+
+.mainFormDiv {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    border-radius: 20px;
+}
+
+.rightContent {
+    flex: 1;
+    z-index: 1;
+    background: #fff;
+    margin: 60px 40px;
+    border-radius: 20px;
+    text-align: left;
+}
+
+.leftContent {
+    flex: 1;
+    width: 700px;
+    padding: 80px 40px 0 40px;
+    text-align: left;
+}
+
+.leftContent h2 {
+    font-size: 32px;
+    font-weight: 600;
+    z-index: 20;
+    position: relative;
+}
+
+.leftContent p {
+    font-size: 16px;
+    position: relative;
+    z-index: 20;
+}
+
+.leftContent a {
+    color: #1a1a1a;
+    text-decoration: none;
+    position: relative;
+    z-index: 20;
+}
+
+.leftContent .highlight {
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+
+.leftContent img {
+    position: absolute;
+    top: 0;
+    left: 40px;
+    max-width: 537px;
+    z-index: 0;
+}
+
+
+/* Form Styles */
+.bookingForm {
+    padding: 40px;
+}
+
+.bookingForm h3 {
+    font-size: 24px;
+    font-weight: 600;
+    margin: 0 0 8px 0;
+    color: #1a1a1a;
+}
+
+.bookingForm p {
+    color: var(--primary-color);
+    margin: 0 0 32px 0;
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.formGroup {
+    margin-bottom: 20px;
+}
+
+.formInput,
+.formInput:focus {
+    width: 100%;
+    padding: 12px 10px;
+    border: 2px solid #e5e7eb;
+    border-radius: 10px;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    background: white;
+}
+
+.formInput:focus {
+    outline: none;
+    border-color: var(--primary-color, #6376E8);
+    box-shadow: 0 0 0 3px rgba(99, 118, 232, 0.1);
+}
+
+.errorInput {
+    border-color: #ef4444 !important;
+}
+
+.errorText {
+    color: #ef4444;
+    font-size: 14px;
+    margin-top: 4px;
+    display: block;
+}
+
+.formRow {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+.enquireBtn {
+    width: 100%;
+    background: linear-gradient(135deg, #6376E8 0%, #5A6BCE 100%);
+    color: white;
+    border: none;
+    padding: 12px;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 8px;
+}
+
+.enquireBtn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 20px 40px rgba(99, 118, 232, 0.4);
+}
+
+.loadingBtn {
+    opacity: 0.8;
+    cursor: not-allowed;
+}
+
+.spinner {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: white;
+    animation: spin 1s ease-in-out infinite;
+    margin-right: 10px;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.guaranteeBadges {
+    margin-top: 32px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.badge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: #666;
+}
+
+.badgeIcon {
+    background: #10b981;
+    color: white;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+/* Success State */
+.successContent {
+    padding: 60px 40px;
+    text-align: center;
+}
+
+.successIcon img {
+    width: 50px
+}
+
+.successTitle {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin: 0 0 16px 0;
+}
+
+.successMessage {
+    font-size: 18px;
+    color: #374151;
+    margin: 0 0 12px 0;
+    line-height: 1.6;
+}
+
+.successContact {
+    font-size: 16px;
+    color: #6b7280;
+    margin: 0;
+}
+
+.errorMessage {
+    background: #fef2f2;
+    color: #dc2626;
+    padding: 12px 16px;
+    border-radius: 8px;
+    border-left: 4px solid #ef4444;
+    margin-bottom: 20px;
+}
+
+.guaranteeBadges {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 25px;
+}
+
+.badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #1a1a1a;
+  font-size: 0.9rem;
+}
+
+.badgeIcon {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  font-weight: bold;
+  color: #fff;
+  background-color: var(--primary-color);
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@media (max-width: 480px) {
+
+    .formWrapper{
+        background: #fff;
+        border: 1px solid #c9c9c9;
+    }
+
+    .leftContent {
+        display: none;
+    }
+
+    .rightContent{
+        margin: 40px 20px;
+    }
+
+    .bookingForm {
+        padding: 0;
+    }
+
+    .formHeader {
+        margin-bottom: 24px;
+    }
+
+    .formHeader h3 {
+        font-size: 20px;
+    }
+
+    .formInput {
+        padding: 12px;
+        font-size: 16px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+    }
+
+    .formRow {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+
+    .formGroup{
+        margin: 0;
+    }
+
+
+    .enquireBtn {
+        padding: 12px;
+        border-radius: 8px;
+    }
+
+    .successContent {
+        padding: 24px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        min-height: 630px;
+    }
+
+    .successIcon img {
+        width: 80px;
+        margin-bottom: 12px;
+    }
+
+    .successTitle {
+        font-size: 24px;
+    }
+
+    .successMessage span {
+        font-weight: 700;
+        color: var(--primary-color);
+    }
+}
